@@ -129,6 +129,51 @@
     @media(max-width:720px){html{scroll-padding-top:72px}.container{width:min(100% - 36px,520px)}.header-inner{height:67px;gap:10px}.nav-links{display:none}.brand-symbol{width:53px;height:33px}.brand-text b{font-size:13px}.brand-text small{font-size:9px}.btn-header{font-size:12px;padding:12px 12px}.hero{display:flex;flex-direction:column;align-items:stretch;gap:43px;padding:65px 0 87px}.eyebrow{font-size:10px;letter-spacing:1.2px;margin-bottom:20px}.hero h1{font-size:clamp(38px,10vw,53px);letter-spacing:-2px;margin-bottom:19px}.hero-lead{font-size:14px;line-height:1.95;margin-bottom:25px}.hero-chips{margin-bottom:26px}.btn-large{width:100%;font-size:14px}.visual-panel{min-height:auto;padding:27px 23px;border-radius:21px}.visual-top strong{font-size:22px}.security-board{margin:33px 0 25px;gap:9px}.security-item{min-height:90px;padding:14px 12px}.security-item svg{width:22px;height:22px}.security-item b{font-size:12px}.stats-outer{margin-top:-38px}.stats{border-radius:16px}.stat{padding:19px 15px 20px}.stat-label{font-size:11px}.stat-value{font-size:14px}.stat-value small{font-size:10px}main{padding:73px 0 75px}.section{margin-bottom:75px}.section-head{display:block;margin-bottom:24px}.section-title{font-size:28px}.section-desc{max-width:none;margin-top:12px;font-size:13px}.grid-2{grid-template-columns:1fr;gap:12px}.target-card{min-height:0;padding:27px 25px}.curriculum-grid{gap:10px}.step-card{padding:23px 18px;min-height:225px}.step-card h3{font-size:15px}.benefits-shell{padding:17px;border-radius:18px}.benefits-grid{grid-template-columns:1fr;gap:9px}.benefit{padding:15px}.faq-item{padding:0 18px}.faq-item summary{font-size:14px;min-height:67px}.footer-cta{display:block;padding:36px 25px;text-align:left}.footer-cta h2{font-size:26px}.btn-white{display:flex;margin-top:25px;width:100%;font-size:14px}.site-footer{font-size:11px}}
     @media(max-width:375px){.brand-text small{display:none}.curriculum-grid{grid-template-columns:1fr}.step-card{min-height:0}.step-num{margin-bottom:17px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+
+    /* Design direction: friendly 3D mascot, sky blue/soft pink, still professional */
+    :root{--blue:#087bcf;--blue2:#075fae;--navy:#12284b;--bg:#f8fbff;--shadow:0 24px 64px rgba(12,78,143,.07)}
+    .hero-band{background:linear-gradient(125deg,#f9fcff 0%,#f0f8ff 60%,#eaf6ff 100%)}
+    .hero-band::before{background:radial-gradient(circle,rgba(79,192,243,.14),transparent 67%)}
+    .hero{gap:clamp(24px,4vw,60px);padding:82px 0 98px}
+    .eyebrow{color:#087bcf}
+    .hero h1 em{color:#087bcf}
+    .hero-lead{color:#586b85}
+    .chip{border-color:#d8eaf6;background:rgba(255,255,255,.88);color:#3b6689}
+    .btn-primary{background:#087bcf;box-shadow:0 9px 24px rgba(8,123,207,.19)}
+    .btn-primary:hover{background:#075fae}
+    .brand-symbol{background:#fff}
+    .brand-symbol span{color:#087bcf}
+    .stat-value{color:#162d4b}
+    .target-icon{background:#e8f7ff;color:#087bcf}
+    .target-card li::before{background:#25a5e2}
+    .step-card::before{background:linear-gradient(90deg,#0783d4,#6acdf7)}
+    .benefits-shell{background:#eef8fe;border-color:#dbedf9}
+    .benefit-mark{background:#e6f6ff;color:#0783d4}
+    .footer-cta{background:linear-gradient(115deg,#102e5c,#124e85)}
+    .mascot-intro,.mascot-scene,.mascot-bottom{position:relative;z-index:2}
+    .visual-panel--mascot{background:linear-gradient(155deg,#49c5f1 0%,#28b5ef 48%,#0792dc 100%);padding:32px 33px 21px;min-height:516px;border:1px solid rgba(255,255,255,.5);box-shadow:0 26px 55px rgba(18,127,196,.18);border-radius:31px}
+    .visual-panel--mascot::before{width:375px;height:375px;right:-80px;top:-118px;border-color:rgba(255,255,255,.25);box-shadow:0 0 0 72px rgba(255,255,255,.035),0 0 0 150px rgba(255,255,255,.03)}
+    .visual-panel--mascot::after{background-image:linear-gradient(rgba(255,255,255,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);mask-image:linear-gradient(180deg,transparent,black);opacity:.35}
+    .mascot-small-heading{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.88);font-weight:850}
+    .mascot-intro-row{display:flex;justify-content:space-between;align-items:start;gap:13px;margin-top:8px}
+    .mascot-intro-row strong{font-size:21px;line-height:1.4;letter-spacing:-.6px;font-weight:800;word-break:keep-all}
+    .mascot-edition{font-size:9px;line-height:1.35;letter-spacing:1.4px;font-weight:800;text-align:center;border:1px solid rgba(255,255,255,.6);padding:9px 12px;border-radius:10px;flex:none}
+    .mascot-scene{height:340px;margin:4px -14px -4px;display:flex;align-items:center;justify-content:center}
+    .mascot-art{display:block;width:min(100%,470px);max-height:370px;height:auto;overflow:visible;position:relative;filter:drop-shadow(0 6px 16px rgba(29,99,149,.05))}
+    .mascot-float{position:absolute;z-index:4;background:rgba(255,255,255,.94);box-shadow:0 9px 20px rgba(23,92,151,.13);border:1px solid rgba(255,255,255,.98);font-size:9px;letter-spacing:1px;font-weight:900;color:#2473a0;border-radius:12px;padding:10px 12px;white-space:nowrap}
+    .mascot-float i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#41c09b;margin-right:4px}
+    .mascot-float--top{top:47px;left:0;transform:rotate(-7deg)}
+    .mascot-float--side{right:0;bottom:74px;transform:rotate(7deg)}
+    .mascot-float--side b{color:#f5a30e;margin-left:4px}
+    .mascot-bottom{display:flex;justify-content:space-between;align-items:center;gap:15px;padding-top:14px;border-top:1px solid rgba(255,255,255,.38)}
+    .mascot-bottom>span:first-child{display:flex;align-items:center;gap:9px}
+    .mascot-bottom b{font-size:11px;font-weight:900;letter-spacing:1.2px}
+    .mascot-bottom small{font-size:9px;font-weight:650;opacity:.85;letter-spacing:.7px}
+    .mascot-status{font-size:9px;font-weight:850;letter-spacing:1.2px;white-space:nowrap}
+    .mascot-status i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#b6f7d5;margin-right:5px}
+    @media(max-width:1020px){.visual-panel--mascot{padding:26px 23px 18px;min-height:472px}.mascot-scene{height:308px}.mascot-art{max-height:335px}.mascot-intro-row strong{font-size:18px}.mascot-bottom small{display:none}}
+    @media(max-width:720px){.hero{gap:28px;padding:60px 0 78px}.visual-panel--mascot{min-height:0;padding:26px 24px 19px}.mascot-scene{height:clamp(280px,78vw,365px)}.mascot-art{max-height:100%}.mascot-intro-row strong{font-size:20px}.mascot-float--top{top:30px;left:0}.mascot-float--side{right:0;bottom:55px}.mascot-bottom small{display:inline}.mascot-bottom{padding-top:10px}}
+    @media(max-width:400px){.mascot-intro-row strong{font-size:18px}.mascot-edition{font-size:8px;padding:7px}.mascot-bottom small{display:none}.mascot-scene{height:270px}.mascot-float{font-size:8px;padding:8px}}
   </style>
 </head>
 <body>
@@ -158,30 +203,61 @@
         </a>
         <div class="hero-meta"><span>2026년 10월 27일 개강</span><i aria-hidden="true"></i><span>가디언즈 인프라 보안 15기</span></div>
       </div>
-      <div class="visual-panel" aria-label="인프라 보안 교육 분야를 나타낸 일러스트">
-        <div class="visual-top">
-          <div><small>ESTSOFT KDT PROGRAM</small><strong>Security Infrastructure<br>Learning Track</strong></div>
-          <span class="visual-pill">15TH</span>
+      <div class="visual-panel visual-panel--mascot" aria-label="노트북으로 정보보안을 공부하는 귀여운 분홍색 캐릭터 일러스트">
+        <div class="mascot-intro">
+          <span class="mascot-small-heading">START YOUR SECURITY JOURNEY</span>
+          <div class="mascot-intro-row"><strong>배우는 과정도,<br>시작하는 마음도 가볍게.</strong><span class="mascot-edition">15TH<br>EDITION</span></div>
         </div>
-        <div class="security-board">
-          <div class="security-item">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M17.5 11v3M14 17.5h7M17.5 14v7"/></svg>
-            <b>네트워크 · 리눅스</b><span>FOUNDATION</span>
-          </div>
-          <div class="security-item">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17h14a4 4 0 0 0 .4-8 7 7 0 0 0-13.5 2.2A3.5 3.5 0 0 0 5 17Z"/><path d="M9 20h6m-3-3v3"/></svg>
-            <b>클라우드 보안</b><span>CLOUD SECURITY</span>
-          </div>
-          <div class="security-item">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
-            <b>취약점 진단</b><span>SECURITY TESTING</span>
-          </div>
-          <div class="security-item">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/><path d="M3 3v18h18" opacity=".65"/></svg>
-            <b>보안관제 · 대응</b><span>SECURITY OPERATIONS</span>
-          </div>
+        <div class="mascot-scene">
+          <span class="mascot-float mascot-float--top"><i></i> NETWORK · CLOUD</span>
+          <span class="mascot-float mascot-float--side">SECURITY <b>↗</b></span>
+          <svg class="mascot-art" viewBox="0 0 520 475" role="img" aria-label="커다란 눈을 가진 분홍색 캐릭터가 은색 노트북을 사용하고 있어요" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="mascot-body" x1="0" y1="0" x2=".92" y2="1"><stop stop-color="#ffe5e8"/><stop offset=".49" stop-color="#ffc7d2"/><stop offset="1" stop-color="#e79baa"/></linearGradient>
+              <radialGradient id="mascot-white" cx=".37" cy=".27" r=".83"><stop stop-color="#fff"/><stop offset=".68" stop-color="#fafbff"/><stop offset="1" stop-color="#d8dce6"/></radialGradient>
+              <radialGradient id="mascot-eye" cx=".32" cy=".22" r=".88"><stop stop-color="#393943"/><stop offset=".42" stop-color="#181a20"/><stop offset="1" stop-color="#06070a"/></radialGradient>
+              <linearGradient id="mascot-orange" x1=".2" y1="0" x2=".9" y2="1"><stop stop-color="#ffe58a"/><stop offset=".43" stop-color="#ffb931"/><stop offset="1" stop-color="#eb8619"/></linearGradient>
+              <linearGradient id="mascot-laptop" x1="0" y1="0" x2=".92" y2="1"><stop stop-color="#f6f8fc"/><stop offset=".5" stop-color="#d2d9e4"/><stop offset="1" stop-color="#a7b4c6"/></linearGradient>
+              <filter id="mascot-shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="13" stdDeviation="13" flood-color="#136e9a" flood-opacity=".24"/></filter>
+              <filter id="mascot-soft" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#6b6382" flood-opacity=".2"/></filter>
+            </defs>
+            <ellipse cx="262" cy="447" rx="181" ry="18" fill="#1176b2" opacity=".17"/>
+            <g filter="url(#mascot-shadow)">
+              <path d="M148 165C141 91 188 52 254 50c74-3 136 40 143 112l14 182c5 65-51 108-139 109-91 1-158-44-159-111Z" fill="url(#mascot-body)"/>
+              <path d="M152 219c-5 27-8 76-3 101" stroke="#ffe4e7" stroke-width="13" opacity=".4" stroke-linecap="round"/>
+              <ellipse cx="180" cy="317" rx="44" ry="72" fill="#f9beca" transform="rotate(-22 180 317)"/>
+              <ellipse cx="357" cy="317" rx="44" ry="72" fill="#f9bac5" transform="rotate(21 357 317)"/>
+            </g>
+            <g filter="url(#mascot-soft)">
+              <ellipse cx="199" cy="155" rx="91" ry="99" fill="url(#mascot-white)"/>
+              <ellipse cx="330" cy="153" rx="91" ry="99" fill="url(#mascot-white)"/>
+              <ellipse cx="241" cy="157" rx="38" ry="49" fill="url(#mascot-eye)"/>
+              <ellipse cx="305" cy="157" rx="38" ry="49" fill="url(#mascot-eye)"/>
+              <ellipse cx="230" cy="134" rx="11" ry="14" fill="#fff" opacity=".95"/>
+              <ellipse cx="294" cy="133" rx="11" ry="14" fill="#fff" opacity=".95"/>
+              <ellipse cx="254" cy="172" rx="7" ry="12" fill="#f5f8ff" opacity=".22"/>
+              <ellipse cx="319" cy="172" rx="7" ry="12" fill="#f5f8ff" opacity=".22"/>
+            </g>
+            <g filter="url(#mascot-soft)">
+              <ellipse cx="174" cy="405" rx="71" ry="47" transform="rotate(20 174 405)" fill="url(#mascot-orange)"/>
+              <ellipse cx="362" cy="404" rx="71" ry="47" transform="rotate(-20 362 404)" fill="url(#mascot-orange)"/>
+              <ellipse cx="155" cy="390" rx="28" ry="11" transform="rotate(-15 155 390)" fill="#fff6be" opacity=".35"/>
+              <ellipse cx="386" cy="389" rx="27" ry="11" transform="rotate(16 386 389)" fill="#fff6be" opacity=".3"/>
+            </g>
+            <g filter="url(#mascot-soft)">
+              <rect x="143" y="263" width="249" height="135" rx="16" fill="url(#mascot-laptop)" stroke="#e9eef5" stroke-width="2"/>
+              <path d="M135 392h268l-16 12H151Z" fill="#a4b1c0"/>
+              <path d="M138 394h262l-8 6H147Z" fill="#e4e8ee"/>
+              <rect x="165" y="273" width="204" height="4" rx="2" fill="white" opacity=".45"/>
+              <circle cx="270" cy="330" r="16" fill="#fff" opacity=".24"/>
+              <path d="m266 326 4-4 4 4-4 10Z" fill="#f6f8fd" opacity=".6"/>
+            </g>
+          </svg>
         </div>
-        <div class="visual-foot"><b>기초 이해 → 실습 → 프로젝트</b><small>LEARN · PRACTICE · BUILD</small></div>
+        <div class="mascot-bottom">
+          <span><b>GUARDIANS</b> <small>15TH · K-DIGITAL TRAINING</small></span>
+          <span class="mascot-status"><i></i> 100% ONLINE</span>
+        </div>
       </div>
     </div>
   </div>
