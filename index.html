@@ -144,6 +144,68 @@
       transform: translateY(-2px);
     }
 
+    /* ESTsoft official branding (image served from the company's official site CDN) */
+    .estsoft-identity {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 14px 22px 14px 12px;
+      margin-bottom: 28px;
+      background: linear-gradient(120deg, #ffffff 55%, #f0f5ff);
+      border: 1px solid #e1e9f7;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(22, 52, 118, 0.07);
+    }
+    .estsoft-image-wrap {
+      position: relative;
+      width: 142px;
+      height: 66px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .estsoft-image-fallback {
+      color: #0b51ff;
+      font-family: Arial, sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: -0.12em;
+      font-weight: 900;
+    }
+    .estsoft-official-logo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: white;
+    }
+    .estsoft-brand-description strong {
+      display: block;
+      font-size: 1.04rem;
+      letter-spacing: -0.3px;
+      color: #142c58;
+    }
+    .estsoft-brand-description small {
+      display: block;
+      color: #516482;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+    @media (max-width: 480px) {
+      .estsoft-identity { gap: 10px; padding: 10px 14px 10px 8px; }
+      .estsoft-image-wrap { width: 100px; height: 56px; }
+      .estsoft-brand-description strong { font-size: 0.92rem; }
+      .estsoft-brand-description small { font-size: 0.72rem; }
+      .hero { padding-top: 36px; }
+    }
+
     /* Summary Info Bar */
     .info-bar {
       display: grid;
@@ -355,6 +417,24 @@
 
     <!-- HERO SECTION -->
     <section class="hero">
+      <!-- Official EST logo: original image from estsoft.ai's CDN -->
+      <div class="estsoft-identity">
+        <div class="estsoft-image-wrap">
+          <span class="estsoft-image-fallback" aria-hidden="true">EST</span>
+          <img
+            class="estsoft-official-logo"
+            src="https://framerusercontent.com/images/UNeDRd8bUynrLCZujjwdf03txg.png?height=718&amp;width=1559"
+            alt="이스트소프트 EST 공식 로고"
+            width="142" height="66"
+            fetchpriority="high"
+            decoding="async"
+            onerror="this.style.display='none'">
+        </div>
+        <div class="estsoft-brand-description">
+          <strong>이스트소프트</strong>
+          <small>AI 선도기업 K-Digital Training</small>
+        </div>
+      </div>
       <span class="badge">KDT 국비지원 · 100% 실시간 비대면</span>
       <h1>
         공격을 알아야<br>
