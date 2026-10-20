@@ -174,6 +174,39 @@
     @media(max-width:1020px){.visual-panel--mascot{padding:26px 23px 18px;min-height:472px}.mascot-scene{height:308px}.mascot-art{max-height:335px}.mascot-intro-row strong{font-size:18px}.mascot-bottom small{display:none}}
     @media(max-width:720px){.hero{gap:28px;padding:60px 0 78px}.visual-panel--mascot{min-height:0;padding:26px 24px 19px}.mascot-scene{height:clamp(280px,78vw,365px)}.mascot-art{max-height:100%}.mascot-intro-row strong{font-size:20px}.mascot-float--top{top:30px;left:0}.mascot-float--side{right:0;bottom:55px}.mascot-bottom small{display:inline}.mascot-bottom{padding-top:10px}}
     @media(max-width:400px){.mascot-intro-row strong{font-size:18px}.mascot-edition{font-size:8px;padding:7px}.mascot-bottom small{display:none}.mascot-scene{height:270px}.mascot-float{font-size:8px;padding:8px}}
+  
+    /* 3D guardian illustration: crisp studio rendering + spacious responsive art direction */
+    .visual-panel--mascot{
+      background:radial-gradient(circle at 78% 21%,rgba(190,245,255,.26),transparent 38%),linear-gradient(148deg,#39bcf1 0%,#19a5e9 48%,#067ec9 100%);
+      box-shadow:0 25px 60px rgba(9,104,180,.20), inset 0 1px 0 rgba(255,255,255,.22);
+    }
+    .mascot-scene{margin:6px -10px -8px;height:342px;isolation:isolate}
+    .mascot-scene::before{content:"";position:absolute;z-index:-1;left:50%;top:52%;transform:translate(-50%,-50%);width:80%;height:73%;border-radius:50%;background:radial-gradient(ellipse,rgba(224,251,255,.28),rgba(255,255,255,0) 68%);pointer-events:none}
+    .mascot-art--render{width:min(100%,410px);height:auto;max-height:100%;object-fit:contain;flex:none;margin:9px auto 0;filter:drop-shadow(0 17px 12px rgba(0,67,113,.17))}
+    .mascot-float{font-size:10px;border-radius:12px;padding:10px 13px;box-shadow:0 12px 26px rgba(0,77,129,.13);letter-spacing:.6px}
+    .mascot-float--top{top:33px;left:2px;transform:rotate(-5deg)}
+    .mascot-float--side{bottom:56px;right:1px;transform:rotate(5deg)}
+    .mascot-small-heading{letter-spacing:1.8px}
+    .mascot-bottom{position:relative;z-index:5}
+    @media(max-width:1020px){
+      .mascot-scene{height:316px}
+      .mascot-art--render{width:min(100%,370px)}
+      .mascot-float--top{top:34px}
+      .mascot-float--side{bottom:44px}
+    }
+    @media(max-width:720px){
+      .mascot-scene{height:clamp(272px,77vw,350px);margin:5px -9px -4px}
+      .mascot-art--render{width:min(100%,405px);margin-top:5px}
+      .mascot-float--top{top:28px}
+      .mascot-float--side{bottom:48px}
+    }
+    @media(max-width:400px){
+      .mascot-scene{height:262px}
+      .mascot-art--render{width:100%}
+      .mascot-float{font-size:8px;padding:8px 9px}
+      .mascot-float--top{top:28px;left:-1px}
+      .mascot-float--side{right:-1px;bottom:41px}
+    }
   </style>
 </head>
 <body>
@@ -211,48 +244,7 @@
         <div class="mascot-scene">
           <span class="mascot-float mascot-float--top"><i></i> NETWORK · CLOUD</span>
           <span class="mascot-float mascot-float--side">SECURITY <b>↗</b></span>
-          <svg class="mascot-art" viewBox="0 0 520 475" role="img" aria-label="커다란 눈을 가진 분홍색 캐릭터가 은색 노트북을 사용하고 있어요" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="mascot-body" x1="0" y1="0" x2=".92" y2="1"><stop stop-color="#ffe5e8"/><stop offset=".49" stop-color="#ffc7d2"/><stop offset="1" stop-color="#e79baa"/></linearGradient>
-              <radialGradient id="mascot-white" cx=".37" cy=".27" r=".83"><stop stop-color="#fff"/><stop offset=".68" stop-color="#fafbff"/><stop offset="1" stop-color="#d8dce6"/></radialGradient>
-              <radialGradient id="mascot-eye" cx=".32" cy=".22" r=".88"><stop stop-color="#393943"/><stop offset=".42" stop-color="#181a20"/><stop offset="1" stop-color="#06070a"/></radialGradient>
-              <linearGradient id="mascot-orange" x1=".2" y1="0" x2=".9" y2="1"><stop stop-color="#ffe58a"/><stop offset=".43" stop-color="#ffb931"/><stop offset="1" stop-color="#eb8619"/></linearGradient>
-              <linearGradient id="mascot-laptop" x1="0" y1="0" x2=".92" y2="1"><stop stop-color="#f6f8fc"/><stop offset=".5" stop-color="#d2d9e4"/><stop offset="1" stop-color="#a7b4c6"/></linearGradient>
-              <filter id="mascot-shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="13" stdDeviation="13" flood-color="#136e9a" flood-opacity=".24"/></filter>
-              <filter id="mascot-soft" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#6b6382" flood-opacity=".2"/></filter>
-            </defs>
-            <ellipse cx="262" cy="447" rx="181" ry="18" fill="#1176b2" opacity=".17"/>
-            <g filter="url(#mascot-shadow)">
-              <path d="M148 165C141 91 188 52 254 50c74-3 136 40 143 112l14 182c5 65-51 108-139 109-91 1-158-44-159-111Z" fill="url(#mascot-body)"/>
-              <path d="M152 219c-5 27-8 76-3 101" stroke="#ffe4e7" stroke-width="13" opacity=".4" stroke-linecap="round"/>
-              <ellipse cx="180" cy="317" rx="44" ry="72" fill="#f9beca" transform="rotate(-22 180 317)"/>
-              <ellipse cx="357" cy="317" rx="44" ry="72" fill="#f9bac5" transform="rotate(21 357 317)"/>
-            </g>
-            <g filter="url(#mascot-soft)">
-              <ellipse cx="199" cy="155" rx="91" ry="99" fill="url(#mascot-white)"/>
-              <ellipse cx="330" cy="153" rx="91" ry="99" fill="url(#mascot-white)"/>
-              <ellipse cx="241" cy="157" rx="38" ry="49" fill="url(#mascot-eye)"/>
-              <ellipse cx="305" cy="157" rx="38" ry="49" fill="url(#mascot-eye)"/>
-              <ellipse cx="230" cy="134" rx="11" ry="14" fill="#fff" opacity=".95"/>
-              <ellipse cx="294" cy="133" rx="11" ry="14" fill="#fff" opacity=".95"/>
-              <ellipse cx="254" cy="172" rx="7" ry="12" fill="#f5f8ff" opacity=".22"/>
-              <ellipse cx="319" cy="172" rx="7" ry="12" fill="#f5f8ff" opacity=".22"/>
-            </g>
-            <g filter="url(#mascot-soft)">
-              <ellipse cx="174" cy="405" rx="71" ry="47" transform="rotate(20 174 405)" fill="url(#mascot-orange)"/>
-              <ellipse cx="362" cy="404" rx="71" ry="47" transform="rotate(-20 362 404)" fill="url(#mascot-orange)"/>
-              <ellipse cx="155" cy="390" rx="28" ry="11" transform="rotate(-15 155 390)" fill="#fff6be" opacity=".35"/>
-              <ellipse cx="386" cy="389" rx="27" ry="11" transform="rotate(16 386 389)" fill="#fff6be" opacity=".3"/>
-            </g>
-            <g filter="url(#mascot-soft)">
-              <rect x="143" y="263" width="249" height="135" rx="16" fill="url(#mascot-laptop)" stroke="#e9eef5" stroke-width="2"/>
-              <path d="M135 392h268l-16 12H151Z" fill="#a4b1c0"/>
-              <path d="M138 394h262l-8 6H147Z" fill="#e4e8ee"/>
-              <rect x="165" y="273" width="204" height="4" rx="2" fill="white" opacity=".45"/>
-              <circle cx="270" cy="330" r="16" fill="#fff" opacity=".24"/>
-              <path d="m266 326 4-4 4 4-4 10Z" fill="#f6f8fd" opacity=".6"/>
-            </g>
-          </svg>
+          <img class="mascot-art mascot-art--render" src="./guardian-mascot.svg" width="560" height="520" alt="은색 노트북으로 정보보안을 공부하는 분홍색 3D 가디언즈 캐릭터" fetchpriority="high" decoding="async">
         </div>
         <div class="mascot-bottom">
           <span><b>GUARDIANS</b> <small>15TH · K-DIGITAL TRAINING</small></span>
