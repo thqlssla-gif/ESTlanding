@@ -203,6 +203,14 @@ function dashboard(){
   return '<div class="desk-lesson-row"><div style="min-width:0"><strong>'+E(c.name)+'</strong><small>'+E(c.time||'시간 미정')+' · '+E(c.room||'강의실 미정')+' · '+count+'/'+total+'회차</small></div>'+pill(done>=count?'진도 정상':'진도 미체크',done>=count?'green':'amber')+'</div>';
  }).join(''):'<div class="desk-empty-note">오늘 예정된 수업이 없습니다.<br>엑셀 시간표를 추가하면 일정에 자동으로 표시돼요.</div>';
  h+='</div></section></div>';
+ 
+ const templateCourses=db.courses.filter(c=>c.uploadSource==='sample-template');
+ if(templateCourses.length){
+  h+='<section class="desk-surface" style="margin-top:16px;padding:21px"><div class="desk-panel-title"><h3>엑셀 개강표 <small>시간표_양식.xlsx · '+templateCourses.length+'개 과정</small></h3><button class="text-link" data-nav="courses">전체 시간표 →</button></div><div class="course-grid">';
+  h+=templateCourses.map(c=>'<div class="course-card" style="padding:15px 17px;box-shadow:none"><div class="flex" style="justify-content:space-between;gap:8px">'+pill(c.kind||'과정')+'<span class="small muted">'+E(c.room||'강의실 미정')+'</span></div><h3 style="margin:11px 0 6px;font-size:14px">'+E(c.name)+'</h3><div class="small muted">'+E(c.start)+' ~ '+E(c.end)+'</div><div class="small muted" style="margin-top:5px">'+E(c.days)+' · '+E(c.time)+' · '+c.total+'회차</div></div>').join('');
+  h+='</div></section>';
+ }
+
  h+='<div class="desk-course-filter"><button class="desk-outline" data-nav="students">학생 '+db.students.length+'명 관리</button><button class="desk-outline" data-nav="tasks">할 일 '+dueTasks.length+'건 확인</button></div>';
  return h;
 }
