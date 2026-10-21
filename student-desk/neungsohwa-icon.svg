@@ -1,20 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="능소화 꽃 아이콘">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="t d">
+<title id="t">능소화 로고</title><desc id="d">로즈 핑크 배경 위에 살구빛 능소화 한 송이</desc>
 <defs>
- <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#bc76b4"/><stop offset="1" stop-color="#856dbf"/></linearGradient>
- <radialGradient id="petal" cx=".36" cy=".2" r=".83"><stop stop-color="#ffd29d"/><stop offset=".46" stop-color="#ff9c76"/><stop offset="1" stop-color="#e97263"/></radialGradient>
- <radialGradient id="throat"><stop stop-color="#fff5b1"/><stop offset=".42" stop-color="#f6c663"/><stop offset="1" stop-color="#ed9165"/></radialGradient>
- <filter id="sh"><feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#71355f" flood-opacity=".24"/></filter>
+ <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e9a9b8"/><stop offset=".57" stop-color="#d98ba5"/><stop offset="1" stop-color="#b86d92"/></linearGradient>
+ 
+ <radialGradient id="petal" cx=".33" cy=".22" r=".95"><stop stop-color="#ffe4c7"/><stop offset=".43" stop-color="#ffb58f"/><stop offset=".82" stop-color="#f48a74"/><stop offset="1" stop-color="#dc6872"/></radialGradient>
+ <radialGradient id="inside" cx=".46" cy=".43" r=".72"><stop stop-color="#fff6c7"/><stop offset=".54" stop-color="#ffd77b"/><stop offset="1" stop-color="#e58b62"/></radialGradient>
+ <filter id="shadow" x="-25%" y="-25%" width="160%" height="160%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#873f66" flood-opacity=".21"/></filter>
 </defs>
-<rect width="96" height="96" rx="23" fill="url(#bg)"/>
-<g filter="url(#sh)" transform="translate(48 48)">
- <path d="M-7 -10 C -26 -29 -14 -40 -1 -34 C 9 -29 6 -18 4 -8 Z" fill="url(#petal)" stroke="#ffd0a4" stroke-width="1.2"/>
- <path d="M6 -9 C 15 -30 35 -29 37 -14 C 38 -3 25 3 11 4 Z" fill="url(#petal)" stroke="#ffd0a4" stroke-width="1.2"/>
- <path d="M11 3 C 37 6 34 27 18 32 C 5 32 3 18 1 11 Z" fill="url(#petal)" stroke="#ffd0a4" stroke-width="1.2"/>
- <path d="M1 12 C -12 39 -32 30 -30 15 C -28 4 -15 3 -6 0 Z" fill="url(#petal)" stroke="#ffd0a4" stroke-width="1.2"/>
- <path d="M-8 1 C -36 -4 -32 -27 -18 -31 C -5 -31 -2 -18 2 -10 Z" fill="url(#petal)" stroke="#ffd0a4" stroke-width="1.2"/>
- <path d="M-7 -9 Q -17 -17 -20 -23 M7 -10 Q19 -19 28 -17 M11 6 Q23 16 20 24 M-4 13 Q-13 24 -22 20 M-9 0 Q-22 -3 -24 -15" fill="none" stroke="#ffd0a4" opacity=".85" stroke-width="1.4" stroke-linecap="round"/>
- <circle cx="1" cy="1" r="10" fill="url(#throat)"/>
- <path d="M-3 -4L-5 3M5 -4L7 3M0 2L0 7" stroke="#b35f42" stroke-width="1.2" opacity=".7" stroke-linecap="round"/>
- <circle cx="-3" cy="0" r="1.6" fill="#9c5949"/><circle cx="5" cy="2" r="1.4" fill="#9c5949"/>
+<rect x="1" y="1" width="94" height="94" rx="23" fill="url(#plate)"/>
+<rect x="1.75" y="1.75" width="92.5" height="92.5" rx="22.5" fill="none" stroke="#ffe8e9" stroke-opacity=".48" stroke-width="1.5"/>
+<path d="M11 23C16 16 22 12 28 10" fill="none" stroke="#ffe9e9" stroke-opacity=".52" stroke-width="2" stroke-linecap="round"/>
+<g filter="url(#shadow)" transform="translate(48 49) scale(.78)">
+ <path d="M-10-7C-27-23-21-43-8-46C6-50 14-31 7-9L2 2Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M6-10C16-34 40-38 48-23C57-6 32 6 12 8L0 4Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M12 5C38 3 53 20 42 36C33 49 17 43 4 18L-1 8Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M3 14C3 39-15 53-32 43C-46 35-38 19-15 4L-4 1Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M-13 5C-40 13-52-5-42-24C-34-41-13-31 2-11L4-1Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <g fill="none" stroke="#ffe2c5" stroke-opacity=".85" stroke-width="2" stroke-linecap="round">
+  <path d="M-4-12C-8-27-11-33-11-37"/><path d="M11-4C23-18 30-22 38-23"/><path d="M13 11C27 20 31 28 32 34"/><path d="M-5 14C-13 26-22 33-29 34"/><path d="M-14 0C-27-5-33-12-36-17"/>
+ </g>
+ <circle cy="2" cx="1" r="14" fill="#ef936a" opacity=".7"/>
+ <circle cy="1" cx="0" r="11.3" fill="url(#inside)"/>
+ <g stroke="#bc6a50" stroke-width="1.6" stroke-linecap="round" opacity=".86"><path d="M-4 0L-7 7"/><path d="M3-2L7 5"/><path d="M-1 2L-1 10"/></g>
+ <g fill="#af5f4e"><circle cx="-7" cy="7" r="1.7"/><circle cx="7" cy="5" r="1.6"/><circle cx="-1" cy="10" r="1.6"/></g>
+ <circle cx="-3" cy="-3" r="2.1" fill="#fff9e0" opacity=".95"/>
 </g>
+<circle cx="76" cy="17" r="1.8" fill="#ffe8d8" opacity=".9"/><circle cx="83" cy="23" r="1" fill="#ffe8d8" opacity=".7"/>
 </svg>
