@@ -33,54 +33,24 @@ function notify(s){clearTimeout(toastTimer);document.querySelectorAll('.toast').
 
 /* 가상 학생/과정/업무로만 구성한 참고 사이트 체험 데이터 */
 function exampleDate(n){const d=new Date(TODAY()+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function buildExamples(){
- const courses=[],students=[],tasks=[],templates=[];
- const c=(name,start,end,total,progress,days,time,mode,teacher,memo)=>{
-  const item={id:uid(),name,start:exampleDate(start),end:exampleDate(end),total,progress,days,time,mode,teacher,memo,example:true};courses.push(item);return item.id};
- const a=c('예시 · 정보처리기사 실기 평일반',7,38,20,0,'월~금','19:30 ~ 22:00','오프라인','김정훈','프로그래밍 · SQL · 실기 문제 유형별 대비');
- const b=c('예시 · SQLD 단기 주말반',5,33,8,0,'토·일','09:30 ~ 13:30','오프라인','박서연','데이터 모델링 · SQL · 기출 모의고사');
- const py=c('예시 · 파이썬 기초 (화·목)',-30,15,12,8,'화·목','10:00 ~ 13:00','오프라인','이도윤','변수 · 반복문 · 함수 · 파일 입출력 · 미니 프로젝트');
- const li=c('예시 · 리눅스마스터 2급 평일반',-20,20,12,5,'월·수·금','19:00 ~ 22:00','오프라인','최민','리눅스 명령어 · 파일 권한 · 시스템 관리');
- c('예시 · DBMS (1차)',14,45,10,0,'월·수·금','19:00 ~ 22:00','오프라인','','데이터베이스 기본 · ERD · SQL 실습');
- c('예시 · DBMS (2차)',42,75,10,0,'월·수·금','19:00 ~ 22:00','오프라인','','정규화 · JOIN · 서브쿼리');
- c('예시 · DBMS (3차)',70,104,10,0,'월·수·금','19:00 ~ 22:00','오프라인','','DB 설계 실무 · 팀 프로젝트');
- const student=(name,phone,status,goal,source,courseId,memo,next,notes)=>{
-  students.push({id:uid(),name:'예시 '+name,phone,status,goal,source,courseId,memo,nextContact:next==null?'':exampleDate(next),logs:notes.map(([n,body])=>({id:uid(),date:exampleDate(n),body})),updatedAt:new Date().toISOString(),example:true});
- };
- student('이서준','010-0000-1234','수강중','정보처리기사 실기 · 개발 취업','블로그',a,'비전공자 · 파이썬 기초 병행. 실기 로드맵 제공 필요.',2,[[-12,'첫 상담: 자격증 및 개발자 취업 준비 방향 확인'],[-6,'정보처리기사 실기 시간표 안내'],[-1,'문제 풀이 어려운 부분 확인']]);
- student('박지민','010-0000-5678','등록대기','정보처리기사 실기 준비','인스타그램',a,'평일 저녁 수업만 가능. 개강 일정 최종 확인 예정.',3,[[-9,'직장 병행 가능한 저녁 수업 문의'],[-3,'평일반 일정 및 교재 안내']]);
- student('최유나','010-0000-2468','수강중','SQLD · 데이터 분석 입문','소개',b,'SQLD 이후 데이터 분석 분야 학습 희망.',7,[[-16,'SQL 기초 학습 경험 확인'],[-4,'모의고사 준비 및 시험 일정 확인']]);
- student('정하늘','010-0000-1357','수강중','리눅스 → 정보보안 취업','블로그',li,'네트워크와 리눅스 실무 역량 향상 후 보안 과정 검토.',5,[[-20,'정보보안 분야 취업 목표 확인'],[-8,'리눅스 명령어 실습 진행도 점검']]);
- student('한도윤','010-0000-9999','상담중','AI · 개발 진로 탐색','온라인 문의','','다음 주 재상담. 비전공자 로드맵 비교 필요.',0,[[-12,'개발과 AI 진로 선택 관련 첫 상담'],[-2,'프로그래밍 기초 학습 순서 안내']]);
- const task=(title,offset,time,category,memo,done=false)=>tasks.push({id:uid(),title:'예시 · '+title,due:exampleDate(offset),time,category,memo,done,example:true});
- task('한도윤 학생 콜백',0,'15:00','콜백','AI 분야 선택 및 상담 일정 재확인');
- task('정보처리기사 실기 교재 수량 확인',2,'11:00','개강준비','등록 예정 인원 기준 수량 확인');
- task('국비 서류 스캔 정리',-1,'16:00','서류','누락 서류 확인');
- task('박지민 학생 등록 일정 안내',3,'14:00','상담','저녁반 일정 최종 안내');
- task('최유나 SQLD 모의고사 피드백',7,'13:30','수업','취약 영역 정리');
- task('정하늘 리눅스 실습 진도 점검',5,'17:30','콜백','명령어 실습 확인');
- task('파이썬 수업 진도표 정리',1,'10:00','수업','8회차 진도 기록 정리');
- task('DBMS 1차 개강 문자 준비',10,'10:30','개강준비','강의실 및 개강 시간 확인');
- task('지난주 상담 기록 정리',-4,'18:00','기타','상담 히스토리 업데이트',true);
- const tmpl=(title,body)=>templates.push({id:uid(),title:'예시 · '+title,body,example:true});
- tmpl('개강 D-7 안내','안녕하세요, {이름}님!\n{과정} 개강 1주 전 안내드립니다.\n\n개강일: {개강일}\n수업 시간: {시간}\n진행 방식: {방식}\n\n궁금한 점 있으시면 편하게 말씀 주세요.');
- tmpl('개강 D-1 확인','안녕하세요, {이름}님!\n내일 {과정} 수업이 시작됩니다.\n시작 시간: {시간}\n준비사항을 다시 확인 부탁드립니다. :)');
- tmpl('학습 진도 점검','안녕하세요, {이름}님!\n{과정} 학습은 잘 진행되고 있으실까요?\n어려운 부분이나 더 연습하고 싶은 내용이 있으면 편하게 알려주세요.');
- tmpl('종강 전 진로 상담','안녕하세요, {이름}님!\n{과정} 수업 마무리 시점에 맞춰 학습 방향을 점검해 보는 건 어떠실까요?');
- return {students,courses,tasks,templates};
-}
+function buildExamples(){return buildReferenceExamples(uid,TODAY())}
 function exampleCount(){return ['students','courses','tasks','templates'].reduce((n,k)=>n+db[k].filter(x=>x.example).length,0)}
-function seedExamples(){const items=buildExamples();for(const k of ['students','courses','tasks','templates'])db[k].push(...items[k]);db.settings.examplesInitialized=true}
+function seedExamples(){const items=buildExamples();for(const k of ['students','courses','tasks','templates'])db[k].push(...items[k]);db.settings.examplesInitialized=true;db.settings.referenceDemoVersion=2}
 function clearExamples(){for(const k of ['students','courses','tasks','templates'])db[k]=db[k].filter(x=>!x.example);db.settings.examplesInitialized=true}
 function examplePanel(){
- return '<div class="panel"><div class="panel-header"><h3 class="panel-title">🍓 참고 사이트 예시 데이터</h3>'+pill(exampleCount()+'개 예시')+'</div><p class="muted" style="line-height:1.8;margin:0 0 17px">예시 학생 5명 · 과정 7개 · 일정 9개 · 문자 템플릿 4개와 상담 기록을 체험할 수 있어요. 이름과 일정은 가상이며 전화번호는 테스트용입니다.</p><div class="flex wrap"><button class="btn primary" data-action="add-examples">＋ 예시 데이터 불러오기</button>'+(exampleCount()?'<button class="btn danger" data-action="remove-examples">예시 데이터만 삭제</button>':'')+'</div><p class="small muted" style="margin:13px 0 0">직접 입력한 학생과 과정은 유지되며, 같은 예시가 중복 등록되지 않습니다.</p></div>';
+ const old=exampleCount()>0&&db.settings.referenceDemoVersion!==2;
+ return '<div class="panel"><div class="panel-header"><h3 class="panel-title">📚 KAIA DESK 원본 공개 예시 데이터</h3>'+pill(exampleCount()+'개 예시')+'</div>'+
+ '<p class="muted" style="line-height:1.85;margin:0 0 16px">원본 공개 데모의 <b>학생 5명 · 교육과정 7개 · 할 일 3개 · 저장 문구 3개 · 개강/종강 안내 템플릿 5개</b>를 가져왔어요. 실제 수업 일정, 진도, 과정 연결, 상담 메모도 포함됩니다.</p>'+
+ (old?'<div class="alert" style="margin-bottom:15px">이전에 넣었던 임의 예시가 있어요. 아래 버튼으로 원본 데이터로 교체할 수 있어요. 직접 입력한 학생 정보는 유지됩니다.</div>':'')+
+ '<div class="flex wrap"><button class="btn primary" data-action="apply-reference">'+(exampleCount()?'원본 공개 예시로 교체':'원본 공개 예시 추가')+'</button>'+
+ (exampleCount()?'<button class="btn danger" data-action="remove-examples">예시 데이터만 삭제</button>':'')+'</div>'+
+ '<p class="small muted" style="margin:13px 0 0">원본 사이트의 공개 가상 자료만 사용하며, 비공개 사용자 기록이나 원본 멘토의 연락처는 포함하지 않았습니다.</p></div>';
 }
-
 function fresh(){db=blank();page='home';studentQuery='';studentFilter='전체';messageTemplate='welcome';modal=null}
 function storeOk(){try{return !!localStorage.getItem(STORAGE)}catch(e){return false}}
 function authScreen(){let exists=storeOk();app.innerHTML='<div class="auth-layout"><div class="auth-card"><div class="auth-logo">✿</div><div class="eyebrow" style="margin-top:24px">PERSONAL MENTOR WORKSPACE</div><h1>'+ (exists?'다시 오셨네요!':'나만의 학생관리 데스크')+'</h1><p>'+(exists?'비밀번호를 입력하면 저장해둔 상담 기록과 학생 정보를 불러옵니다.':'학생관리 데이터를 보호할 비밀번호를 처음 한 번 설정해 주세요. 이 비밀번호는 서버로 보내지지 않습니다.')+'</p><form data-form="'+(exists?'unlock':'setup')+'" class="auth-form"><div class="field-group"><label class="field-label" for="pass">비밀번호</label><input id="pass" type="password" name="password" class="field" autocomplete="'+(exists?'current-password':'new-password')+'" minlength="8" required placeholder="8자 이상"></div>'+(exists?'':'<div class="field-group"><label class="field-label">비밀번호 확인</label><input type="password" name="confirm" class="field" minlength="8" autocomplete="new-password" required placeholder="한 번 더 입력"></div>')+'<button type="submit" class="btn primary" style="padding:14px"> '+(exists?'잠금 해제':'개인 데스크 만들기')+' → </button></form><div class="auth-note">🔒 학생 기록은 이 기기의 브라우저에 암호화해 저장됩니다. 비밀번호를 잊으면 기존 데이터를 복구할 수 없습니다. 다른 기기에서는 백업 파일을 가져와야 합니다.</div>'+(exists?'<button class="text-link" data-action="restore">암호화 백업 파일 가져오기</button>':'')+'<p class="lock-note">GitHub Pages는 페이지를 공개하지만, 실제 학생 기록이나 비밀번호를 GitHub 저장소에 올리지 않습니다.</p></div></div>'}
 async function setup(password){let salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(password,salt);fresh();seedExamples();localStorage.setItem(STORAGE,JSON.stringify({version:1,salt:bytesTo64(salt),iv:'',data:''}));await persist();render();notify('예시 학생 · 과정 · 상담 기록이 준비됐어요 🍓')}
-async function unlock(password){const obj=JSON.parse(localStorage.getItem(STORAGE));const k=await derive(password,b64ToBytes(obj.salt));let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));let read=JSON.parse(new TextDecoder().decode(raw));if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');key=k;db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));page='home';if(!db.settings.examplesInitialized&&!db.students.length&&!db.courses.length&&!db.tasks.length){seedExamples();await persist()}render();notify('안전하게 잠금을 해제했어요')}
+async function unlock(password){const obj=JSON.parse(localStorage.getItem(STORAGE));const k=await derive(password,b64ToBytes(obj.salt));let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));let read=JSON.parse(new TextDecoder().decode(raw));if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');key=k;db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));page='home';if(!db.settings.referenceDemoVersion && exampleCount()>0 && db.tasks.filter(x=>x.example).length===9 && db.templates.filter(x=>x.example).length===4){clearExamples();seedExamples();await persist()}else if(!db.settings.examplesInitialized&&!db.students.length&&!db.courses.length&&!db.tasks.length){seedExamples();await persist()}render();notify('안전하게 잠금을 해제했어요')}
 const tabs=[['home','대시보드'],['students','학생 관리'],['courses','과정 · 시간표'],['calendar','일정 캘린더'],['tasks','할 일 · 콜백'],['messages','문자 템플릿'],['settings','설정 · 백업']];
 function shell(content){const title=tabs.find(x=>x[0]===page)?.[1]||'대시보드';const nav=tabs.map(x=>'<button class="nav-btn '+(page===x[0]?'active':'')+'" data-nav="'+x[0]+'">'+icon(x[0])+'<span>'+x[1]+'</span></button>').join('');
 app.innerHTML='<div class="app"><aside class="sidebar"><div class="brand"><div class="brand-mark">✿</div><div><h1>SO:BIN DESK</h1><small>MENTOR WORKSPACE</small></div></div><div class="nav-label">WORKSPACE</div><div class="nav">'+nav+'</div><div class="side-bottom"><div class="secure-box"><b><span class="secure-dot"></span> 개인 암호화 저장</b>이 브라우저에만 데이터가 저장됩니다. 다른 기기에는 암호화 백업을 가져와 주세요.</div><div class="user-small"><span class="user-icon">'+E((db.settings.mentor||'소').slice(0,1))+'</span><div><strong>'+E(db.settings.mentor)+' 멘토</strong><br>개인 워크스페이스</div></div></div></aside><div class="workspace"><header class="topbar"><div class="breadcrumb">SO:BIN DESK <b>/ '+E(title)+'</b></div><div class="top-right"><span class="date-badge">'+new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(new Date())+'</span><span class="avatar">'+E((db.settings.mentor||'소').slice(0,1))+'</span><button title="잠그기" data-action="lock" class="btn sm">'+icon('lock')+'</button></div></header><div class="content">'+content+'</div></div></div>'+(modal||'') }
@@ -149,7 +119,11 @@ if(!ds.action)return;
 switch(ds.action){
 case 'close':modal=null;render();break;
 case 'lock':key=null;fresh();authScreen();notify('화면을 잠갔어요');break;
-case 'add-examples':if(exampleCount()){notify('이미 예시 데이터가 등록되어 있어요. 중복 추가하지 않았어요.');break}seedExamples();await persist();render();notify('예시 학생 5명 · 과정 7개 · 업무 9개를 추가했어요');break;
+case 'add-examples':
+case 'apply-reference':{
+ if(exampleCount()&&!confirm('저장된 기존 예시만 KAIA DESK 원본 공개 예시로 교체할까요? 직접 등록한 기록은 유지됩니다.'))break;
+ clearExamples();seedExamples();await persist();render();notify('KAIA DESK 공개 예시 반영 완료: 학생 5명 · 과정 7개 · 할 일 3건');break;
+}
 case 'remove-examples':if(!exampleCount()){notify('삭제할 예시 데이터가 없어요');break}if(!confirm('예시 데이터만 삭제할까요? 직접 등록한 학생 및 기록은 유지됩니다.'))break;clearExamples();await persist();render();notify('예시 데이터만 삭제했어요');break;
 case 'backup':await saveChain;download('sobin-desk-encrypted-'+TODAY()+'.json',localStorage.getItem(STORAGE),'application/json');notify('암호화된 백업 파일을 저장했어요');break;
 case 'restore':document.getElementById('restoreInput').click();break;
