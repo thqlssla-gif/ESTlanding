@@ -123,23 +123,90 @@ function authScreen(){let exists=storeOk();app.innerHTML='<div class="auth-layou
 async function setup(password){let salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(password,salt);fresh();seedExamples();ensureTemplateTimetable();localStorage.setItem(STORAGE,JSON.stringify({version:1,salt:bytesTo64(salt),iv:'',data:''}));await persist();render();notify('예시 학생 · 과정 · 상담 기록이 준비됐어요 🍓')}
 async function unlock(password){const obj=JSON.parse(localStorage.getItem(STORAGE));const k=await derive(password,b64ToBytes(obj.salt));let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));let read=JSON.parse(new TextDecoder().decode(raw));if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');key=k;db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));page='home';if(!db.settings.referenceDemoVersion && exampleCount()>0 && db.tasks.filter(x=>x.example).length===9 && db.templates.filter(x=>x.example).length===4){clearExamples();seedExamples();await persist()}else if(!db.settings.examplesInitialized&&!db.students.length&&!db.courses.length&&!db.tasks.length){seedExamples();await persist()}if(ensureTemplateTimetable())await persist();render();notify('안전하게 잠금을 해제했어요')}
 const tabs=[['home','대시보드'],['students','학생 관리'],['courses','과정 · 시간표'],['calendar','일정 캘린더'],['tasks','할 일 · 콜백'],['messages','문자 템플릿'],['settings','설정 · 백업']];
-function shell(content){const title=tabs.find(x=>x[0]===page)?.[1]||'대시보드';const nav=tabs.map(x=>'<button class="nav-btn '+(page===x[0]?'active':'')+'" data-nav="'+x[0]+'">'+icon(x[0])+'<span>'+x[1]+'</span></button>').join('');
-app.innerHTML='<div class="app"><aside class="sidebar"><div class="brand"><div class="brand-mark">✿</div><div><h1>SO:BIN DESK</h1><small>MENTOR WORKSPACE</small></div></div><div class="nav-label">WORKSPACE</div><div class="nav">'+nav+'</div><div class="side-bottom"><div class="secure-box"><b><span class="secure-dot"></span> 개인 암호화 저장</b>이 브라우저에만 데이터가 저장됩니다. 다른 기기에는 암호화 백업을 가져와 주세요.</div><div class="user-small"><span class="user-icon">'+E((db.settings.mentor||'소').slice(0,1))+'</span><div><strong>'+E(db.settings.mentor)+' 멘토</strong><br>개인 워크스페이스</div></div></div></aside><div class="workspace"><header class="topbar"><div class="breadcrumb">SO:BIN DESK <b>/ '+E(title)+'</b></div><div class="top-right"><span class="date-badge">'+new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(new Date())+'</span><span class="avatar">'+E((db.settings.mentor||'소').slice(0,1))+'</span><button title="잠그기" data-action="lock" class="btn sm">'+icon('lock')+'</button></div></header><div class="content">'+content+'</div></div></div>'+(modal||'') }
+
+function shell(content){
+ const title=tabs.find(x=>x[0]===page)?.[1]||'대시보드';
+ const links=[['home','홈'],['courses','시간표'],['messages','개강안내'],['students','학생'],['calendar','알림'],['tasks','진도 · 할 일'],['settings','설정']];
+ const count=dashboardAlerts().length;
+ const nav=links.map(([id,name])=>'<button data-nav="'+id+'" class="'+(page===id?'active':'')+'" aria-current="'+(page===id?'page':'false')+'">'+icon(id)+'<span>'+name+'</span>'+(id==='calendar'&&count?'<span class="nav-count">'+count+'</span>':'')+'</button>').join('');
+ app.innerHTML='<div class="app"><div class="workspace">'+
+ '<header class="desk-header"><div class="desk-dots" aria-hidden="true"><i></i><i></i><i></i></div>'+
+ '<div class="desk-wordmark"><span class="symbol">✿</span>SO:BIN DESK</div>'+
+ '<nav class="desk-nav" aria-label="학생관리 메뉴">'+nav+'</nav>'+
+ '<div class="desk-actions"><div class="desk-shield"><span class="desk-status"></span><span>암호화 저장</span></div>'+
+ '<button type="button" class="desk-icon-action" data-action="xlsx-import" title="엑셀 시간표 업로드" aria-label="엑셀 업로드">'+icon('courses')+'</button>'+
+ '<button type="button" class="desk-icon-action" data-action="lock" title="잠금" aria-label="잠금">'+icon('lock')+'</button>'+
+ '<div class="desk-profile"><div class="avatar">'+E((db.settings.mentor||'소').slice(0,1))+'</div><span><b>'+E(db.settings.mentor)+'</b><small>'+E(db.settings.branch||'개인 멘토')+'</small></span></div></div></header>'+
+ '<main class="content '+(page==='home'?'desk-main':'desk-section')+'" aria-label="'+E(title)+'">'+content+'</main></div></div>'+(modal||'');
+}
+
 function heading(title,sub,actions){return '<div class="heading"><div><div class="eyebrow">MENTOR WORKSPACE</div><h2>'+E(title)+'</h2><p>'+E(sub||'')+'</p></div>'+(actions||'')+'</div>'}
 function empty(iconText,title,desc,button){return '<div class="empty"><div class="emo">'+iconText+'</div><b>'+E(title)+'</b><p>'+E(desc)+'</p>'+(button||'')+'</div>'}
 function recentTasks(){return db.tasks.filter(t=>!t.done).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'))}
 function latestStudents(){return [...db.students].sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''))}
 function stat(label,num,sub,emoji){return '<div class="stat"><div class="stat-top"><span class="stat-label">'+label+'</span><div class="stat-icon">'+emoji+'</div></div><div class="stat-num">'+num+'</div><div class="stat-sub">'+sub+'</div></div>'}
-function dashboard(){let due=recentTasks().filter(t=>t.due&&t.due<=TODAY());let next=recentTasks().slice(0,5),students=latestStudents().slice(0,5), active=db.courses.filter(c=>c.start<=TODAY()&&(!c.end||c.end>=TODAY()));
-let h='<div class="hero"><div class="hero-inner"><div class="hero-label">YOUR EVERYDAY MENTOR DESK</div><h2>'+E(db.settings.mentor)+' 멘토님,<br>오늘도 좋은 하루 보내세요!</h2><p>학생 한 명 한 명의 성장 기록을 한 곳에서 관리해요.</p></div><div class="hero-berry" aria-hidden="true">🍓</div></div>';
-h+=(exampleCount()?'<div class="alert" style="margin-bottom:18px">🍓 체험용 예시 데이터가 포함되어 있어요. <button class="text-link" data-nav="settings">설정 · 백업</button>에서 예시만 삭제할 수 있습니다.</div>':'')+'<div class="stats">'+stat('전체 학생',db.students.length,'기록된 전체 학생','👥')+stat('상담 진행',db.students.filter(s=>s.status==='상담중').length,'현재 상담 진행 중','💬')+stat('진행 중 과정',active.length,'오늘 기준 수업 과정','📚')+stat('밀린 · 오늘 할 일',due.length,'오늘까지 완료해야 할 업무','🗓️')+'</div>';
-h+='<div class="grid2"><div class="panel"><div class="panel-header"><h3 class="panel-title">최근 학생 · 상담 현황</h3><button class="text-link" data-nav="students">전체 보기 →</button></div>';
-h+=students.length?students.map(s=>'<div class="row-item"><div class="row-icon">👤</div><div class="row-copy"><strong>'+E(s.name)+'</strong><small>'+E(s.goal||s.source||'준비 방향 미입력')+'</small></div>'+pill(s.status,statusColor(s.status))+'<button class="btn sm" data-view-student="'+E(s.id)+'">상세</button></div>').join(''):empty('📝','아직 등록한 학생이 없어요','첫 학생을 등록하고 상담 기록을 쌓아보세요.','<button class="btn primary sm" data-add="student">학생 추가</button>');
-h+='</div><div class="panel"><div class="panel-header"><h3 class="panel-title">다가오는 업무 · 콜백</h3><button class="text-link" data-nav="tasks">전체 보기 →</button></div>';
-h+=next.length?next.map(t=>'<div class="row-item"><div class="row-icon">✓</div><div class="row-copy"><strong>'+E(t.title)+'</strong><small>'+E(niceDate(t.due))+(t.time?' · '+E(t.time):'')+'</small></div>'+pill(t.due&&t.due<TODAY()?'기한 지남':t.due===TODAY()?'오늘':'예정',t.due&&t.due<=TODAY()?'red':'')+'</div>').join(''):empty('🌷','등록한 일정이 없어요','상담 콜백이나 해야 할 일을 등록해 보세요.','<button class="btn soft sm" data-add="task">할 일 추가</button>');
-h+='</div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">과정 진행 현황</h3><button class="text-link" data-nav="courses">전체 과정 →</button></div>';
-h+=db.courses.length?'<div class="course-grid">'+db.courses.slice(0,4).map(courseCard).join('')+'</div>':empty('📚','등록한 과정이 없어요','과정명을 등록하면 학생 배정과 개강일 안내가 편해져요.','<button class="btn primary sm" data-add="course">과정 등록</button>');
-h+='</div>';return h}
+
+function daysBetween(a,b){if(!a||!b)return 9999;const x=new Date(a+'T12:00:00'),y=new Date(b+'T12:00:00');return Math.round((y-x)/86400000)}
+function dashboardAlerts(){
+ const now=TODAY(),alerts=[];
+ db.courses.forEach(c=>{
+  if(c.start&&daysBetween(now,c.start)>=0&&daysBetween(now,c.start)<=7){
+   const n=daysBetween(now,c.start);
+   alerts.push({type:'개강',days:n,date:c.start,title:c.name,subtitle:(c.time||'시간 미정')+' · '+(c.room||'강의실 미정'),course:c,tag:'개강 D-'+n});
+  }
+  if(c.end&&daysBetween(now,c.end)>=0&&daysBetween(now,c.end)<=3){
+   const n=daysBetween(now,c.end);
+   alerts.push({type:'종강',days:n,date:c.end,title:c.name,subtitle:(c.time||'시간 미정')+' · '+(c.room||'강의실 미정'),course:c,tag:'종강 D-'+n});
+  }
+ });
+ return alerts.sort((a,b)=>a.days-b.days||a.date.localeCompare(b.date));
+}
+function clockDisplay(){
+ const d=new Date();
+ return '<span id="desk-live-clock">'+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+'</span><span id="desk-live-seconds">:'+String(d.getSeconds()).padStart(2,'0')+'</span>';
+}
+function dashboard(){
+ const now=TODAY(),alerts=dashboardAlerts();
+ const currCourses=db.courses.filter(c=>c.start&&c.start<=now&&(!c.end||c.end>=now));
+ const todayCourses=db.courses.filter(c=>meets(c,now));
+ const dueTasks=recentTasks().filter(t=>t.due&&t.due<=now);
+ const futureCourses=db.courses.filter(c=>c.start&&c.start>=now).sort((a,b)=>a.start.localeCompare(b.start));
+ const upcoming=futureCourses[0];
+ const daysToNext=upcoming?daysBetween(now,upcoming.start):null;
+ const coursePct=db.courses.length?Math.round(db.courses.reduce((sum,c)=>sum+Math.min(1,Math.max(0,Number(c.progress||0)/Math.max(1,Number(c.total||1)))),0)/db.courses.length*100):0;
+ const idx=currCourses.length?Math.round(currCourses.reduce((sum,c)=>sum+(Number(c.progress||0)),0)) :0;
+ const date=new Date();
+ const dateLabel=new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'long'}).format(date);
+ let h='<div class="desk-kicker">SYSTEM CORE · '+currCourses.length+' ACTIVE · '+alerts.length+' ALERTS</div><div class="desk-grid-top">';
+ h+='<section class="desk-surface desk-greeting"><div class="desk-line-title">IDENTITY · '+E(db.settings.branch||'개인 멘토')+'</div>'+
+ '<h1>좋은 아침이에요,<br>'+E(db.settings.mentor)+'님</h1>'+
+ '<div class="desk-clock">'+clockDisplay()+'</div><div class="desk-date">'+E(dateLabel)+' · PERSONAL DESK</div>'+
+ '<div class="desk-counts">'+[
+  [currCourses.length,'진행 중 과정'],[alerts.length,'확인할 알림'],[todayCourses.length,'오늘 수업'],[dueTasks.length,'오늘까지 할 일']
+ ].map(pair=>'<div class="desk-count"><strong>'+pair[0]+'</strong><span>'+pair[1]+'</span></div>').join('')+'</div>'+
+ '<div class="desk-greeting-actions"><button class="desk-primary" data-nav="messages">↗ 개강안내</button>'+
+ '<button class="desk-outline" data-action="xlsx-import">⇧ 엑셀 올리기</button></div></section>';
+ h+='<section class="desk-orbit-wrap"><div class="desk-orbit" style="--orbit-progress:'+Math.max(12,Math.round(coursePct*3.6))+'deg">'+
+ '<div class="desk-orbit-ring"></div><div class="desk-orbit-core"><strong>✿</strong></div></div>'+
+ '<div class="desk-orbit-summary">STUDENTS '+db.students.length+' · COURSES '+db.courses.length+' · DONE '+idx+' LESSONS</div>'+
+ '<div class="desk-orbit-next">'+(upcoming?'<b>D-'+daysToNext+'</b>'+E(upcoming.name)+' · '+E(niceDate(upcoming.start))+' 개강':'<b>'+coursePct+'%</b>전체 과정 평균 진도')+'</div></section>';
+ h+='<section class="desk-surface desk-alerts"><div class="desk-line-title">ALERTS · '+alerts.length+'</div><div class="desk-alerts-list">';
+ h+=alerts.length?alerts.slice(0,4).map(a=>'<div class="desk-alert-item"><span class="desk-alert-tag">'+E(a.tag)+'</span><div class="desk-alert-body"><b title="'+E(a.title)+'">'+E(a.title)+'</b><small>'+E(niceDate(a.date))+' · '+E(a.subtitle)+'</small></div></div>').join(''):
+ '<div class="desk-alert-empty">현재 7일 이내 개강과<br>3일 이내 종강 알림이 없어요.</div>';
+ h+='</div><div class="desk-alert-footer"><button class="desk-outline" data-nav="calendar">전체 일정</button><button class="desk-outline" data-nav="messages">개강안내</button></div></section></div>';
+ h+='<div class="desk-bottom"><section class="desk-surface"><div class="desk-panel-title"><h3>확인할 알림 <small>개강·종강 D-7 · D-3 · D-1</small></h3><button class="text-link" data-nav="calendar">전체 보기</button></div>';
+ h+=alerts.length?alerts.slice(0,5).map(a=>'<div class="desk-notice-line"><span class="desk-alert-tag">'+E(a.tag)+'</span><div class="txt"><b>'+E(a.title)+'</b><small>'+E(niceDate(a.date))+' · '+E(a.subtitle)+'</small></div><button class="desk-outline" data-nav="messages">안내하기</button></div>').join(''):
+ '<div class="desk-empty-note">확인할 개강·종강 알림이 없습니다. 과정 일정은 시간표에서 볼 수 있어요.</div>';
+ h+='</section><section class="desk-surface"><div class="desk-panel-title"><h3>오늘 수업 <small>'+todayCourses.length+'개</small></h3><button class="text-link" data-nav="courses">시간표 →</button></div><div class="desk-lessons-scroll">';
+ h+=todayCourses.length?todayCourses.slice(0,12).map(c=>{
+  const total=Math.max(1,Number(c.total)||1),done=Number(c.progress||0),count=Array.isArray(c.sessionDates)?c.sessionDates.indexOf(now)+1:done+1;
+  return '<div class="desk-lesson-row"><div style="min-width:0"><strong>'+E(c.name)+'</strong><small>'+E(c.time||'시간 미정')+' · '+E(c.room||'강의실 미정')+' · '+count+'/'+total+'회차</small></div>'+pill(done>=count?'진도 정상':'진도 미체크',done>=count?'green':'amber')+'</div>';
+ }).join(''):'<div class="desk-empty-note">오늘 예정된 수업이 없습니다.<br>엑셀 시간표를 추가하면 일정에 자동으로 표시돼요.</div>';
+ h+='</div></section></div>';
+ h+='<div class="desk-course-filter"><button class="desk-outline" data-nav="students">학생 '+db.students.length+'명 관리</button><button class="desk-outline" data-nav="tasks">할 일 '+dueTasks.length+'건 확인</button></div>';
+ return h;
+}
+
 function studentCourseIds(student){
  const ids=Array.isArray(student.courseIds)?student.courseIds.filter(Boolean):[];
  if(student.courseId&&!ids.includes(student.courseId))ids.unshift(student.courseId);
