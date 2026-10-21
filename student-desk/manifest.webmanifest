@@ -1,0 +1,19 @@
+{
+  "id": "/ESTlanding/student-desk/",
+  "name": "KAIA DESK — 학생관리",
+  "short_name": "KAIA DESK",
+  "description": "학생과 수업, 일정과 상담을 관리하는 개인 워크스페이스",
+  "start_url": "/ESTlanding/student-desk/",
+  "scope": "/ESTlanding/student-desk/",
+  "display": "standalone",
+  "background_color": "#fcf8f9",
+  "theme_color": "#e6a4b9",
+  "icons": [
+    {
+      "src": "./kaia-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
