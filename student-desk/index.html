@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f2effb">
+<meta name="theme-color" content="#f9eeed">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="description" content="개인 멘토를 위한 학생관리 데스크 - 학생, 상담, 과정, 일정, 진도 및 문자 템플릿">
 <title>SO:BIN DESK — 개인 학생관리</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="./style.css?v=2">
+<link rel="stylesheet" href="./style.css?v=3">
 </head>
 <body>
 <div id="app"></div>
 <input id="restoreInput" type="file" accept=".json,application/json" hidden>
 <input id="csvInput" type="file" accept=".csv,text/csv" hidden>
+<input id="scheduleInput" type="file" accept=".xlsx,.xls,.csv" hidden>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 <script src="./reference-demo.js?v=1" defer></script>
-<script src="./app.js?v=3" defer></script>
+<script src="./timetable-seed.js?v=1" defer></script>
+<script src="./app.js?v=4" defer></script>
 </body>
 </html>
