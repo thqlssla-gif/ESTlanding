@@ -209,3 +209,14 @@ body{background:radial-gradient(ellipse at 8% 10%,#f9e2e4 0,transparent 45%),rad
 .desk-kicker{font-size:9px}.desk-alerts{grid-column:auto;padding:20px;min-height:auto}
 .desk-bottom{margin-top:18px}.desk-clock{font-size:45px}
 }
+
+
+/* Leaf-free trumpet creeper blossom - the sole brand decoration */
+.desk-wordmark .flower-icon{height:35px;width:35px;object-fit:contain;display:block;flex:0 0 auto;border-radius:12px;box-shadow:0 5px 13px rgba(143,99,148,.16)}
+.desk-orbit-core .center-flower{width:118px;height:118px;max-width:87%;object-fit:contain;display:block;filter:drop-shadow(0 6px 6px rgba(178,90,99,.14))}
+.auth-logo .flower-icon{height:56px;width:56px;border-radius:18px;display:block;object-fit:contain}
+.auth-logo{background:transparent!important;box-shadow:none!important;overflow:visible}
+@media(max-width:670px){
+.desk-wordmark .flower-icon{height:30px;width:30px}
+.desk-orbit-core .center-flower{height:93px;width:93px}
+}
