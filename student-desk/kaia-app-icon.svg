@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="t">
+<title id="t">KAIA DESK 딸기우유색 앱 아이콘</title>
+<defs><linearGradient id="milk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2BECF"/><stop offset="1" stop-color="#D889A5"/></linearGradient></defs>
+<rect x="6" y="6" width="244" height="244" rx="57" fill="url(#milk)"/>
+<rect x="6.75" y="6.75" width="242.5" height="242.5" rx="56.25" fill="none" stroke="#FFFFFF" stroke-opacity=".34" stroke-width="1.5"/>
+<g fill="#FFFFFF" transform="translate(-68 -56) scale(1.9)">
+<path d="M69.7 124 L99.7 75.4 L108.8 90.4 L89 122.1 Q87.7 124 84.7 124Z"/>
+<path d="M112.9 99.9 Q116.1 94.6 120 100.8 L135.2 124 H107.1 Q104 124 106.1 120.7Z"/>
+<circle cx="116.3" cy="82" r="5.5"/></g></svg>
