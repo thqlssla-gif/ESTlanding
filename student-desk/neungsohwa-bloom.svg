@@ -1,15 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="능소화">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="t d">
+<title id="t">능소화</title><desc id="d">살구빛 꽃잎과 금빛 꽃술의 능소화 한 송이</desc>
 <defs>
- <radialGradient id="petal2" cx=".38" cy=".2" r=".85"><stop stop-color="#ffd5ab"/><stop offset=".42" stop-color="#ffa37f"/><stop offset="1" stop-color="#dd726d"/></radialGradient>
- <radialGradient id="mid2"><stop stop-color="#fff9ca"/><stop offset=".5" stop-color="#f7c85d"/><stop offset="1" stop-color="#e88b61"/></radialGradient>
+ <radialGradient id="petal" cx=".33" cy=".22" r=".95"><stop stop-color="#ffe4c7"/><stop offset=".43" stop-color="#ffb58f"/><stop offset=".82" stop-color="#f48a74"/><stop offset="1" stop-color="#dc6872"/></radialGradient>
+ <radialGradient id="inside" cx=".46" cy=".43" r=".72"><stop stop-color="#fff6c7"/><stop offset=".54" stop-color="#ffd77b"/><stop offset="1" stop-color="#e58b62"/></radialGradient>
+ <filter id="shadow" x="-25%" y="-25%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#ac5e75" flood-opacity=".19"/></filter>
 </defs>
-<g transform="translate(60 60)">
-<path d="M-11 -12C-29 -29 -15 -51 1 -43C12 -38 10 -22 6 -8Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
-<path d="M6 -10C15 -33 42 -29 45 -11C49 6 32 8 11 6Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
-<path d="M13 6C40 7 46 33 23 43C7 47 4 25 0 13Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
-<path d="M0 14C-10 43 -41 40 -41 17C-41 5 -22 4 -8 1Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
-<path d="M-10 1C-40 -3 -45 -29 -29 -41C-10 -50 -4 -20 4 -9Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
-<path d="M-9 -7Q-18 -24 -19 -32 M7 -8Q22 -24 32 -17 M12 7Q25 18 28 30 M-6 12Q-21 22 -27 25 M-10 1Q-25 -11 -33 -14" fill="none" stroke="#ffdbb8" stroke-width="1.8" opacity=".8" stroke-linecap="round"/>
-<circle cx="1" cy="2" r="11" fill="url(#mid2)"/>
-<circle cx="-3" cy="0" r="2" fill="#be7353"/><circle cx="4" cy="5" r="2" fill="#c87c53"/><path d="M0 -1L0 7" stroke="#cc744f" stroke-width="1.5"/>
-</g></svg>
+<g filter="url(#shadow)" transform="translate(60 60) scale(1.07)">
+ <path d="M-10-7C-27-23-21-43-8-46C6-50 14-31 7-9L2 2Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M6-10C16-34 40-38 48-23C57-6 32 6 12 8L0 4Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M12 5C38 3 53 20 42 36C33 49 17 43 4 18L-1 8Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M3 14C3 39-15 53-32 43C-46 35-38 19-15 4L-4 1Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <path d="M-13 5C-40 13-52-5-42-24C-34-41-13-31 2-11L4-1Z" fill="url(#petal)" stroke="#ffe2c2" stroke-width="1.6"/>
+ <g fill="none" stroke="#ffe2c5" stroke-opacity=".85" stroke-width="2" stroke-linecap="round">
+  <path d="M-4-12C-8-27-11-33-11-37"/><path d="M11-4C23-18 30-22 38-23"/><path d="M13 11C27 20 31 28 32 34"/><path d="M-5 14C-13 26-22 33-29 34"/><path d="M-14 0C-27-5-33-12-36-17"/>
+ </g>
+ <circle cy="2" cx="1" r="14" fill="#ef936a" opacity=".7"/>
+ <circle cy="1" cx="0" r="11.3" fill="url(#inside)"/>
+ <g stroke="#bc6a50" stroke-width="1.6" stroke-linecap="round" opacity=".86"><path d="M-4 0L-7 7"/><path d="M3-2L7 5"/><path d="M-1 2L-1 10"/></g>
+ <g fill="#af5f4e"><circle cx="-7" cy="7" r="1.7"/><circle cx="7" cy="5" r="1.6"/><circle cx="-1" cy="10" r="1.6"/></g>
+ <circle cx="-3" cy="-3" r="2.1" fill="#fff9e0" opacity=".95"/>
+</g>
+</svg>
