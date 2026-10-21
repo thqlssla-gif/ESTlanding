@@ -3,10 +3,7 @@
  <radialGradient id="petal2" cx=".38" cy=".2" r=".85"><stop stop-color="#ffd5ab"/><stop offset=".42" stop-color="#ffa37f"/><stop offset="1" stop-color="#dd726d"/></radialGradient>
  <radialGradient id="mid2"><stop stop-color="#fff9ca"/><stop offset=".5" stop-color="#f7c85d"/><stop offset="1" stop-color="#e88b61"/></radialGradient>
 </defs>
-<path d="M22 110C40 86 55 73 62 48" fill="none" stroke="#5a9b73" stroke-width="4" stroke-linecap="round"/>
-<path d="M39 87C20 82 18 70 27 66C37 67 43 75 39 87" fill="#70b68c"/>
-<path d="M41 88C54 72 70 79 72 86C65 93 51 96 41 88" fill="#489d79"/>
-<g transform="translate(65 49)">
+<g transform="translate(60 60)">
 <path d="M-11 -12C-29 -29 -15 -51 1 -43C12 -38 10 -22 6 -8Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
 <path d="M6 -10C15 -33 42 -29 45 -11C49 6 32 8 11 6Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
 <path d="M13 6C40 7 46 33 23 43C7 47 4 25 0 13Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
