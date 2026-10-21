@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="능소화">
+<defs>
+ <radialGradient id="petal2" cx=".38" cy=".2" r=".85"><stop stop-color="#ffd5ab"/><stop offset=".42" stop-color="#ffa37f"/><stop offset="1" stop-color="#dd726d"/></radialGradient>
+ <radialGradient id="mid2"><stop stop-color="#fff9ca"/><stop offset=".5" stop-color="#f7c85d"/><stop offset="1" stop-color="#e88b61"/></radialGradient>
+</defs>
+<path d="M22 110C40 86 55 73 62 48" fill="none" stroke="#5a9b73" stroke-width="4" stroke-linecap="round"/>
+<path d="M39 87C20 82 18 70 27 66C37 67 43 75 39 87" fill="#70b68c"/>
+<path d="M41 88C54 72 70 79 72 86C65 93 51 96 41 88" fill="#489d79"/>
+<g transform="translate(65 49)">
+<path d="M-11 -12C-29 -29 -15 -51 1 -43C12 -38 10 -22 6 -8Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
+<path d="M6 -10C15 -33 42 -29 45 -11C49 6 32 8 11 6Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
+<path d="M13 6C40 7 46 33 23 43C7 47 4 25 0 13Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
+<path d="M0 14C-10 43 -41 40 -41 17C-41 5 -22 4 -8 1Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
+<path d="M-10 1C-40 -3 -45 -29 -29 -41C-10 -50 -4 -20 4 -9Z" fill="url(#petal2)" stroke="#ffd7b0" stroke-width="1.6"/>
+<path d="M-9 -7Q-18 -24 -19 -32 M7 -8Q22 -24 32 -17 M12 7Q25 18 28 30 M-6 12Q-21 22 -27 25 M-10 1Q-25 -11 -33 -14" fill="none" stroke="#ffdbb8" stroke-width="1.8" opacity=".8" stroke-linecap="round"/>
+<circle cx="1" cy="2" r="11" fill="url(#mid2)"/>
+<circle cx="-3" cy="0" r="2" fill="#be7353"/><circle cx="4" cy="5" r="2" fill="#c87c53"/><path d="M0 -1L0 7" stroke="#cc744f" stroke-width="1.5"/>
+</g></svg>
