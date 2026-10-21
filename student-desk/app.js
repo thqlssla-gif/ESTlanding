@@ -91,13 +91,7 @@ function mergeTimetableRows(rows,source){
  }
  return {created,updated,skipped};
 }
-function ensureTemplateTimetable(){
- if(db.settings.templateTimetableAppliedV1)return false;
- if(typeof UPLOADED_TIMETABLE_ROWS==='undefined')return false;
- mergeTimetableRows(UPLOADED_TIMETABLE_ROWS,'sample-template');
- db.settings.templateTimetableAppliedV1=true;
- return true;
-}
+
 async function importTimetableFile(file){
  if(typeof XLSX==='undefined')throw Error('엑셀 읽기 기능이 로드되지 않았어요. 페이지를 새로고침해 주세요.');
  const raw=await file.arrayBuffer(),workbook=XLSX.read(raw,{type:'array',cellDates:true});
@@ -117,11 +111,53 @@ async function importTimetableFile(file){
  notify('엑셀 시간표: '+counts.created+'개 추가 · '+counts.updated+'개 갱신'+(counts.skipped?' · '+counts.skipped+'개 제외':''));
 }
 
+function removeGeneratedSamples(){
+  let removed=0;
+  for(const kind of ['students','courses','tasks','templates']){
+    const oldLength=db[kind].length;
+    db[kind]=db[kind].filter(item=>!item.example&&item.uploadSource!=='sample-template');
+    removed+=oldLength-db[kind].length;
+  }
+  db.settings.samplesDisabled=true;
+  db.settings.templateTimetableAppliedV1=true;
+  db.settings.examplesInitialized=true;
+  return removed;
+}
+function clearManagedRecords(){
+  db.students=[];db.courses=[];db.tasks=[];
+  db.settings.samplesDisabled=true;
+  db.settings.templateTimetableAppliedV1=true;
+  db.settings.examplesInitialized=true;
+}
 function fresh(){db=blank();page='home';studentQuery='';studentFilter='전체';messageTemplate='welcome';modal=null}
 function storeOk(){try{return !!localStorage.getItem(STORAGE)}catch(e){return false}}
-function authScreen(){let exists=storeOk();app.innerHTML='<div class="auth-layout"><div class="auth-card"><div class="auth-logo">✿</div><div class="eyebrow" style="margin-top:24px">PERSONAL MENTOR WORKSPACE</div><h1>'+ (exists?'다시 오셨네요!':'나만의 학생관리 데스크')+'</h1><p>'+(exists?'비밀번호를 입력하면 저장해둔 상담 기록과 학생 정보를 불러옵니다.':'학생관리 데이터를 보호할 비밀번호를 처음 한 번 설정해 주세요. 이 비밀번호는 서버로 보내지지 않습니다.')+'</p><form data-form="'+(exists?'unlock':'setup')+'" class="auth-form"><div class="field-group"><label class="field-label" for="pass">비밀번호</label><input id="pass" type="password" name="password" class="field" autocomplete="'+(exists?'current-password':'new-password')+'" minlength="8" required placeholder="8자 이상"></div>'+(exists?'':'<div class="field-group"><label class="field-label">비밀번호 확인</label><input type="password" name="confirm" class="field" minlength="8" autocomplete="new-password" required placeholder="한 번 더 입력"></div>')+'<button type="submit" class="btn primary" style="padding:14px"> '+(exists?'잠금 해제':'개인 데스크 만들기')+' → </button></form><div class="auth-note">🔒 학생 기록은 이 기기의 브라우저에 암호화해 저장됩니다. 비밀번호를 잊으면 기존 데이터를 복구할 수 없습니다. 다른 기기에서는 백업 파일을 가져와야 합니다.</div>'+(exists?'<button class="text-link" data-action="restore">암호화 백업 파일 가져오기</button>':'')+'<p class="lock-note">GitHub Pages는 페이지를 공개하지만, 실제 학생 기록이나 비밀번호를 GitHub 저장소에 올리지 않습니다.</p></div></div>'}
-async function setup(password){let salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(password,salt);fresh();seedExamples();ensureTemplateTimetable();localStorage.setItem(STORAGE,JSON.stringify({version:1,salt:bytesTo64(salt),iv:'',data:''}));await persist();render();notify('예시 학생 · 과정 · 상담 기록이 준비됐어요 🍓')}
-async function unlock(password){const obj=JSON.parse(localStorage.getItem(STORAGE));const k=await derive(password,b64ToBytes(obj.salt));let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));let read=JSON.parse(new TextDecoder().decode(raw));if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');key=k;db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));page='home';if(!db.settings.referenceDemoVersion && exampleCount()>0 && db.tasks.filter(x=>x.example).length===9 && db.templates.filter(x=>x.example).length===4){clearExamples();seedExamples();await persist()}else if(!db.settings.examplesInitialized&&!db.students.length&&!db.courses.length&&!db.tasks.length){seedExamples();await persist()}if(ensureTemplateTimetable())await persist();render();notify('안전하게 잠금을 해제했어요')}
+function authScreen(){let exists=storeOk();app.innerHTML='<div class="auth-layout"><div class="auth-card"><div class="auth-logo"><img class="flower-icon" src="./neungsohwa-icon.svg?v=2" alt="능소화 꽃"></div><div class="eyebrow" style="margin-top:24px">PERSONAL MENTOR WORKSPACE</div><h1>'+ (exists?'다시 오셨네요!':'나만의 학생관리 데스크')+'</h1><p>'+(exists?'비밀번호를 입력하면 저장해둔 상담 기록과 학생 정보를 불러옵니다.':'학생관리 데이터를 보호할 비밀번호를 처음 한 번 설정해 주세요. 이 비밀번호는 서버로 보내지지 않습니다.')+'</p><form data-form="'+(exists?'unlock':'setup')+'" class="auth-form"><div class="field-group"><label class="field-label" for="pass">비밀번호</label><input id="pass" type="password" name="password" class="field" autocomplete="'+(exists?'current-password':'new-password')+'" minlength="8" required placeholder="8자 이상"></div>'+(exists?'':'<div class="field-group"><label class="field-label">비밀번호 확인</label><input type="password" name="confirm" class="field" minlength="8" autocomplete="new-password" required placeholder="한 번 더 입력"></div>')+'<button type="submit" class="btn primary" style="padding:14px"> '+(exists?'잠금 해제':'개인 데스크 만들기')+' → </button></form><div class="auth-note">🔒 학생 기록은 이 기기의 브라우저에 암호화해 저장됩니다. 비밀번호를 잊으면 기존 데이터를 복구할 수 없습니다. 다른 기기에서는 백업 파일을 가져와야 합니다.</div>'+(exists?'<button class="text-link" data-action="restore">암호화 백업 파일 가져오기</button>':'')+'<p class="lock-note">GitHub Pages는 페이지를 공개하지만, 실제 학생 기록이나 비밀번호를 GitHub 저장소에 올리지 않습니다.</p></div></div>'}
+async function setup(password){
+ const salt=crypto.getRandomValues(new Uint8Array(16));
+ key=await derive(password,salt);
+ fresh();
+ db.settings.samplesDisabled=true;
+ db.settings.examplesInitialized=true;
+ db.settings.templateTimetableAppliedV1=true;
+ localStorage.setItem(STORAGE,JSON.stringify({version:1,salt:bytesTo64(salt),iv:'',data:''}));
+ await persist();render();notify('빈 학생관리 데스크가 준비됐어요');
+}
+async function unlock(password){
+ const obj=JSON.parse(localStorage.getItem(STORAGE));
+ const k=await derive(password,b64ToBytes(obj.salt));
+ const raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));
+ const read=JSON.parse(new TextDecoder().decode(raw));
+ if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');
+ key=k;
+ db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};
+ if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));
+ page='home';
+ if(!db.settings.samplesDisabled){
+   removeGeneratedSamples();
+   await persist();
+ }
+ render();notify('안전하게 잠금을 해제했어요');
+}
 const tabs=[['home','대시보드'],['students','학생 관리'],['courses','과정 · 시간표'],['calendar','일정 캘린더'],['tasks','할 일 · 콜백'],['messages','문자 템플릿'],['settings','설정 · 백업']];
 
 function shell(content){
@@ -131,7 +167,7 @@ function shell(content){
  const nav=links.map(([id,name])=>'<button data-nav="'+id+'" class="'+(page===id?'active':'')+'" aria-current="'+(page===id?'page':'false')+'">'+icon(id)+'<span>'+name+'</span>'+(id==='calendar'&&count?'<span class="nav-count">'+count+'</span>':'')+'</button>').join('');
  app.innerHTML='<div class="app"><div class="workspace">'+
  '<header class="desk-header"><div class="desk-dots" aria-hidden="true"><i></i><i></i><i></i></div>'+
- '<div class="desk-wordmark"><span class="symbol">✿</span>SO:BIN DESK</div>'+
+ '<div class="desk-wordmark"><img class="flower-icon" src="./neungsohwa-icon.svg?v=2" alt="능소화 꽃"> SO:BIN DESK</div>'+
  '<nav class="desk-nav" aria-label="학생관리 메뉴">'+nav+'</nav>'+
  '<div class="desk-actions"><div class="desk-shield"><span class="desk-status"></span><span>암호화 저장</span></div>'+
  '<button type="button" class="desk-icon-action" data-action="xlsx-import" title="엑셀 시간표 업로드" aria-label="엑셀 업로드">'+icon('courses')+'</button>'+
@@ -187,7 +223,7 @@ function dashboard(){
  '<div class="desk-greeting-actions"><button class="desk-primary" data-nav="messages">↗ 개강안내</button>'+
  '<button class="desk-outline" data-action="xlsx-import">⇧ 엑셀 올리기</button></div></section>';
  h+='<section class="desk-orbit-wrap"><div class="desk-orbit" style="--orbit-progress:'+Math.max(12,Math.round(coursePct*3.6))+'deg">'+
- '<div class="desk-orbit-ring"></div><div class="desk-orbit-core"><strong>✿</strong></div></div>'+
+ '<div class="desk-orbit-ring"></div><div class="desk-orbit-core"><img class="center-flower" src="./neungsohwa-bloom.svg?v=2" alt="능소화 꽃"></div></div>'+
  '<div class="desk-orbit-summary">STUDENTS '+db.students.length+' · COURSES '+db.courses.length+' · DONE '+idx+' LESSONS</div>'+
  '<div class="desk-orbit-next">'+(upcoming?'<b>D-'+daysToNext+'</b>'+E(upcoming.name)+' · '+E(niceDate(upcoming.start))+' 개강':'<b>'+coursePct+'%</b>전체 과정 평균 진도')+'</div></section>';
  h+='<section class="desk-surface desk-alerts"><div class="desk-line-title">ALERTS · '+alerts.length+'</div><div class="desk-alerts-list">';
@@ -253,7 +289,7 @@ function fillMessage(template){
  return String(template.body||'').replace(/\{([^}]+)\}/g,(whole,k)=>vals[k]!=null?vals[k]:whole);
 }
 function messages(){let tpl=byId(db.templates,messageTemplate)||db.templates[0]||EMPTY_TEMPLATES[0];let h=heading('문자 템플릿','학생에게 보낼 메시지를 미리 만들고, 이름과 과정 정보를 자동으로 채워요.','<button class="btn primary" data-add="template">＋ 템플릿 추가</button>')+'<div class="template-grid"><div class="panel"><div class="panel-header"><h3 class="panel-title">저장된 문구</h3></div><div class="template-menu">'+db.templates.map(x=>'<button class="template-choice '+(tpl.id===x.id?'active':'')+'" data-template="'+E(x.id)+'">'+E(x.title)+'</button>').join('')+'</div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">'+E(tpl.title)+'</h3><button class="btn sm" data-edit-template="'+E(tpl.id)+'">문구 수정</button></div><div class="form-grid" style="margin-bottom:15px"><div class="field-group"><label class="field-label">학생 선택</label><select id="messageStudent" class="field"><option value="">학생을 선택하세요</option>'+db.students.map(s=>'<option value="'+E(s.id)+'" '+(messageStudent===s.id?'selected':'')+'>'+E(s.name)+'</option>').join('')+'</select></div><div class="field-group"><label class="field-label">과정 선택</label><select id="messageCourse" class="field"><option value="">학생 등록 과정 / 기본값</option>'+db.courses.map(c=>'<option value="'+E(c.id)+'" '+(messageCourse===c.id?'selected':'')+'>'+E(c.name)+'</option>').join('')+'</select></div></div><div class="msg-preview" id="messagePreview">'+E(fillMessage(tpl))+'</div><div class="flex wrap section-gap"><button class="btn primary" data-action="copy-message">✦ 완성 문구 복사</button><button class="btn" data-action="sms-message">문자 앱 열기</button></div><div class="small muted" style="margin-top:14px">문자는 자동 발송되지 않습니다. 발송 전 내용과 연락처를 확인해 주세요.</div></div></div>';return h}
-function settings(){return heading('설정 · 데이터 관리','내 공간을 설정하고 학생 데이터를 안전하게 백업하세요.')+'<div class="panel"><div class="panel-header"><h3 class="panel-title">엑셀 시간표 관리</h3></div><p class="muted">업로드한 시간표_양식.xlsx에 입력된 2개 과정이 등록되어 있어요. 앞으로 동일 양식의 엑셀 파일을 올리면 과정·일정이 자동으로 반영됩니다.</p><button class="btn primary" data-action="xlsx-import">엑셀 시간표 올리기</button></div>'+examplePanel()+'<div class="grid2"><div class="panel"><h3 class="panel-title" style="margin-bottom:20px">프로필 설정</h3><form data-form="settings" class="form-grid"><label class="field-group form-wide"><span class="field-label">멘토명</span><input class="field" name="mentor" maxlength="30" required value="'+E(db.settings.mentor)+'"></label><label class="field-group form-wide"><span class="field-label">소속 표시</span><input class="field" name="branch" maxlength="80" value="'+E(db.settings.branch)+'"></label><div class="form-wide"><button class="btn primary" type="submit">설정 저장</button></div></form></div><div class="panel"><h3 class="panel-title" style="margin-bottom:18px">암호화된 백업 · 복원</h3><div class="alert">학생 정보는 브라우저에서 암호화됩니다. 같은 파일을 다른 PC/휴대폰에서 복원하면 데이터를 옮길 수 있어요. 자동 동기화는 제공하지 않습니다.</div><div class="settings-list"><div class="setting-row"><div><b>암호화 백업 내려받기</b><p>복원하려면 현재 비밀번호가 필요합니다.</p></div><button class="btn primary sm" data-action="backup">백업</button></div><div class="setting-row"><div><b>백업 파일 가져오기</b><p>이 기기의 기존 데이터가 새 파일로 대체됩니다.</p></div><button class="btn sm" data-action="restore">복원</button></div><div class="setting-row"><div><b>학생 CSV 가져오기</b><p>첫 줄: 이름,전화번호,상태,희망분야,메모</p></div><button class="btn sm" data-action="csv-import">CSV</button></div></div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">보안 · 데이터 관리</h3></div><div class="setting-row"><div><b>현재 화면 잠그기</b><p>다시 비밀번호를 입력해야 기록을 열 수 있습니다.</p></div><button class="btn" data-action="lock">잠금</button></div><div class="setting-row"><div><b>이 기기의 모든 데이터 삭제</b><p>암호화된 학생 기록을 영구적으로 지웁니다. 복원하려면 별도의 백업 파일이 필요합니다.</p></div><button class="btn danger" data-action="erase">삭제</button></div><div class="small muted" style="margin-top:17px">저장 방식: 이 브라우저의 암호화된 로컬 저장소 · AES-GCM / PBKDF2. GitHub Pages 자체에는 로그인·서버 동기화·푸시 알림 기능이 없습니다. 공용 기기에서 사용하지 마세요.</div></div>'}
+function settings(){return heading('설정 · 데이터 관리','내 공간을 설정하고 학생 데이터를 안전하게 백업하세요.')+'<div class="panel"><div class="panel-header"><h3 class="panel-title">엑셀 시간표 관리</h3></div><p class="muted">기본 시간표는 비어 있어요. 필요한 과정만 직접 등록하거나 엑셀로 불러올 수 있어요.</p><button class="btn primary" data-action="xlsx-import">엑셀 시간표 올리기</button></div>'+'<div class="panel"><div class="panel-header"><h3 class="panel-title">학생 · 시간표 데이터 비우기</h3></div><p class="muted" style="line-height:1.75">직접 입력한 정보도 모두 초기화하고 싶다면 먼저 백업해 주세요. 학생·수업·상담·업무 정보를 한 번에 비울 수 있어요.</p><div class="flex wrap"><button class="btn danger" data-action="clear-managed-data">학생·수업 모두 비우기</button><button class="btn" data-action="backup">먼저 백업하기</button></div></div>'+'<div class="grid2"><div class="panel"><h3 class="panel-title" style="margin-bottom:20px">프로필 설정</h3><form data-form="settings" class="form-grid"><label class="field-group form-wide"><span class="field-label">멘토명</span><input class="field" name="mentor" maxlength="30" required value="'+E(db.settings.mentor)+'"></label><label class="field-group form-wide"><span class="field-label">소속 표시</span><input class="field" name="branch" maxlength="80" value="'+E(db.settings.branch)+'"></label><div class="form-wide"><button class="btn primary" type="submit">설정 저장</button></div></form></div><div class="panel"><h3 class="panel-title" style="margin-bottom:18px">암호화된 백업 · 복원</h3><div class="alert">학생 정보는 브라우저에서 암호화됩니다. 같은 파일을 다른 PC/휴대폰에서 복원하면 데이터를 옮길 수 있어요. 자동 동기화는 제공하지 않습니다.</div><div class="settings-list"><div class="setting-row"><div><b>암호화 백업 내려받기</b><p>복원하려면 현재 비밀번호가 필요합니다.</p></div><button class="btn primary sm" data-action="backup">백업</button></div><div class="setting-row"><div><b>백업 파일 가져오기</b><p>이 기기의 기존 데이터가 새 파일로 대체됩니다.</p></div><button class="btn sm" data-action="restore">복원</button></div><div class="setting-row"><div><b>학생 CSV 가져오기</b><p>첫 줄: 이름,전화번호,상태,희망분야,메모</p></div><button class="btn sm" data-action="csv-import">CSV</button></div></div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">보안 · 데이터 관리</h3></div><div class="setting-row"><div><b>현재 화면 잠그기</b><p>다시 비밀번호를 입력해야 기록을 열 수 있습니다.</p></div><button class="btn" data-action="lock">잠금</button></div><div class="setting-row"><div><b>이 기기의 모든 데이터 삭제</b><p>암호화된 학생 기록을 영구적으로 지웁니다. 복원하려면 별도의 백업 파일이 필요합니다.</p></div><button class="btn danger" data-action="erase">삭제</button></div><div class="small muted" style="margin-top:17px">저장 방식: 이 브라우저의 암호화된 로컬 저장소 · AES-GCM / PBKDF2. GitHub Pages 자체에는 로그인·서버 동기화·푸시 알림 기능이 없습니다. 공용 기기에서 사용하지 마세요.</div></div>'}
 function render(){if(!key){authScreen();return}const body={home:dashboard,students:students,courses:courses,calendar:calendar,tasks:tasks,messages:messages,settings:settings}[page]||dashboard;shell(body())}
 function dialog(title,body,actions,wide){modal='<div class="modal-shade" data-shade="1"><div class="modal '+(wide?'wide':'')+'" role="dialog" aria-modal="true" aria-label="'+E(title)+'"><div class="modal-head"><h3>'+E(title)+'</h3><button class="modal-close" data-action="close" aria-label="닫기">×</button></div>'+body+(actions||'')+'</div></div>';render();let first=document.querySelector('.modal .field');if(first)first.focus()}
 function actions(saveLabel){return '<div class="modal-actions"><button type="button" class="btn" data-action="close">취소</button><button class="btn primary" type="submit">'+(saveLabel||'저장하기')+'</button></div>'}
@@ -289,12 +325,12 @@ if(!ds.action)return;
 switch(ds.action){
 case 'close':modal=null;render();break;
 case 'lock':key=null;fresh();authScreen();notify('화면을 잠갔어요');break;
-case 'add-examples':
-case 'apply-reference':{
- if(exampleCount()&&!confirm('저장된 기존 예시만 KAIA DESK 원본 공개 예시로 교체할까요? 직접 등록한 기록은 유지됩니다.'))break;
- clearExamples();seedExamples();await persist();render();notify('KAIA DESK 공개 예시 반영 완료: 학생 5명 · 과정 7개 · 할 일 3건');break;
+case 'clear-managed-data':{
+ if(prompt('학생·수업·상담·일정이 영구 삭제됩니다. 계속하려면 "비우기"라고 입력해 주세요.')!=='비우기')break;
+ clearManagedRecords();
+ await persist();render();notify('학생·수업·할 일 정보가 비워졌어요');
+ break;
 }
-case 'remove-examples':if(!exampleCount()){notify('삭제할 예시 데이터가 없어요');break}if(!confirm('예시 데이터만 삭제할까요? 직접 등록한 학생 및 기록은 유지됩니다.'))break;clearExamples();await persist();render();notify('예시 데이터만 삭제했어요');break;
 case 'backup':await saveChain;download('sobin-desk-encrypted-'+TODAY()+'.json',localStorage.getItem(STORAGE),'application/json');notify('암호화된 백업 파일을 저장했어요');break;
 case 'restore':document.getElementById('restoreInput').click();break;
 case 'csv-import':document.getElementById('csvInput').click();break;
