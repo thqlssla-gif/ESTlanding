@@ -315,4 +315,16 @@ document.getElementById('restoreInput').addEventListener('change',async ev=>{let
 document.getElementById('csvInput').addEventListener('change',async ev=>{let file=ev.target.files[0];if(!file)return;try{await importCsv(file)}catch(e){notify('가져오기 실패: '+e.message)}ev.target.value=''});
 document.getElementById('scheduleInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{await importTimetableFile(f)}catch(err){notify('시간표 가져오기 실패: '+err.message)}e.target.value=''});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal){modal=null;render()}});
+
+/* 홈 대시보드 시계는 서버 없이 기기 시계로 갱신됩니다. */
+if(typeof window!=='undefined'&&typeof window.setInterval==='function'){
+ window.setInterval(()=>{
+  const clock=document.getElementById('desk-live-clock'),sec=document.getElementById('desk-live-seconds');
+  if(!clock||!sec)return;
+  const d=new Date();
+  clock.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  sec.textContent=':'+String(d.getSeconds()).padStart(2,'0');
+ },1000);
+}
+
 authScreen();
