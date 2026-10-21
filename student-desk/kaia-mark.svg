@@ -1,19 +1,82 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
-<title id="title">KAIA Desk 로고</title><desc id="desc">로즈 핑크 원형 안의 흰색 KAIA 심볼</desc>
+<title id="title">KAIA Desk 물결 로고</title>
+<desc id="desc">분홍색 원 안에서 두 겹의 물결과 작은 기포가 천천히 움직이고 흰색 KAIA 심볼은 고정되어 있습니다.</desc>
 <defs>
-<linearGradient id="rose" x1=".08" y1=".05" x2=".89" y2="1"><stop offset="0" stop-color="#efb1bf"/><stop offset=".45" stop-color="#e3a3b2"/><stop offset="1" stop-color="#c78399"/></linearGradient>
-<linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff9f9"/><stop offset="1" stop-color="#fff0f2"/></linearGradient>
-<clipPath id="round"><circle cx="100" cy="100" r="96"/></clipPath>
+  <linearGradient id="rose" x1=".08" y1=".05" x2=".89" y2="1">
+    <stop offset="0" stop-color="#efb1bf"/><stop offset=".45" stop-color="#e3a3b2"/><stop offset="1" stop-color="#c78399"/>
+  </linearGradient>
+  <linearGradient id="rearRose" x1="0" y1="0" x2=".8" y2="1">
+    <stop offset="0" stop-color="#f9d5dd"/><stop offset="1" stop-color="#efb2c1"/>
+  </linearGradient>
+  <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+    <stop stop-color="#fffafa"/><stop offset="1" stop-color="#fff1f4"/>
+  </linearGradient>
+  <clipPath id="round"><circle cx="100" cy="100" r="96"/></clipPath>
 </defs>
-<circle cx="100" cy="100" r="97" fill="#ffffff" opacity=".75"/>
+<style><![CDATA[
+  /* Animate liquid layers only, keeping the brand mark crisp and stationary. */
+  .wave-behind { animation: tideBack 8.2s ease-in-out infinite; }
+  .wave-front { animation: tideFront 6.4s ease-in-out infinite; }
+  .water-glint { animation: glimmer 5.1s ease-in-out infinite; }
+  .bubble-one { animation: floatOne 6s ease-in-out infinite; }
+  .bubble-two { animation: floatTwo 7.1s ease-in-out infinite; }
+  .bubble-three { animation: floatThree 5.8s ease-in-out infinite; }
+  @keyframes tideBack {
+    0%, 100% { transform:translate(-10px, 1px); }
+    50% { transform:translate(10px, -3px); }
+  }
+  @keyframes tideFront {
+    0%, 100% { transform:translate(9px, 0px); }
+    50% { transform:translate(-9px, 3px); }
+  }
+  @keyframes glimmer {
+    0%,100% {opacity:.82}
+    50% {opacity:.44}
+  }
+  @keyframes floatOne {
+    0%,100% {transform:translateY(2px);opacity:.5}
+    50% {transform:translateY(-6px);opacity:.8}
+  }
+  @keyframes floatTwo {
+    0%,100% {transform:translateY(1px);opacity:.54}
+    50% {transform:translateY(-8px);opacity:.3}
+  }
+  @keyframes floatThree {
+    0%,100% {transform:translateY(-2px);opacity:.34}
+    50% {transform:translateY(5px);opacity:.67}
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wave-behind,.wave-front,.water-glint,.bubble-one,.bubble-two,.bubble-three {
+      animation:none !important;
+    }
+  }
+]]></style>
+<circle cx="100" cy="100" r="97" fill="#fff" opacity=".68"/>
 <g clip-path="url(#round)">
-<circle cx="100" cy="100" r="96" fill="url(#haze)"/>
-<path d="M3 50 C24 40 30 52 48 46 C67 39 80 37 95 45 C109 52 121 37 133 36 C153 30 160 42 177 41 C189 41 195 44 198 46 L198 201 L2 201Z" fill="url(#rose)"/>
-<path d="M3 50 C22 43 35 48 48 45 C66 40 76 38 93 45 C110 53 120 38 134 35 C153 30 166 42 178 41" fill="none" stroke="#fce5e8" stroke-width="2" opacity=".64"/>
-<path d="M18 52 C16 56 13 62 12 73" fill="none" stroke="#fff" stroke-width="3.1" stroke-linecap="round" opacity=".84"/>
-<circle cx="95" cy="40" r="2.15" fill="#e9a2b3" opacity=".85"/><circle cx="119" cy="34" r="1.65" fill="#dc93a6" opacity=".8"/><circle cx="139" cy="29" r="2.3" fill="#db8ba1" opacity=".8"/>
-<circle cx="59" cy="175" r="2" fill="none" stroke="#fff" stroke-width="1" opacity=".6"/><circle cx="107" cy="154" r="2.6" fill="none" stroke="#fff" stroke-width="1.1" opacity=".52"/><circle cx="112" cy="158" r="1.8" fill="none" stroke="#fff" stroke-width=".9" opacity=".52"/>
-<g fill="#fff"><path d="M69.7 124 L99.7 75.4 L108.8 90.4 L89 122.1 Q87.7 124 84.7 124Z"/><path d="M112.9 99.9 Q116.1 94.6 120 100.8 L135.2 124 H107.1 Q104 124 106.1 120.7Z"/><circle cx="116.3" cy="82" r="5.5"/></g>
+  <circle cx="100" cy="100" r="96" fill="url(#haze)"/>
+  <!-- Extra-wide repeated cubic waves prevent gaps as the layers drift horizontally. -->
+  <g class="wave-behind">
+    <path d="M-105 44 C-80 39 -60 38 -36 44 S10 51 36 43 S82 36 107 44 S153 52 179 43 S225 36 250 44 S294 52 326 43 L326 220 L-105 220 Z" fill="url(#rearRose)"/>
+  </g>
+  <g class="wave-front">
+    <path d="M-105 49 C-80 43 -61 44 -35 48 S10 54 37 47 S82 39 108 48 S155 52 182 43 S227 40 253 48 S297 53 326 46 L326 220 L-105 220 Z" fill="url(#rose)"/>
+    <path d="M-105 49 C-80 43 -61 44 -35 48 S10 54 37 47 S82 39 108 48 S155 52 182 43 S227 40 253 48 S297 53 326 46" fill="none" stroke="#ffedf0" stroke-width="1.4" opacity=".53"/>
+  </g>
+  <path class="water-glint" d="M18 53 C16 58 14 65 13 72" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <!-- Tiny pink details above the waterline. -->
+  <circle cx="95" cy="40" r="2.15" fill="#e9a2b3" opacity=".85"/>
+  <circle cx="119" cy="34" r="1.65" fill="#dc93a6" opacity=".8"/>
+  <circle cx="139" cy="29" r="2.3" fill="#db8ba1" opacity=".8"/>
+  <!-- Floating translucent bubbles. -->
+  <g class="bubble-one" fill="none" stroke="#fff" stroke-width="1.15"><circle cx="107" cy="155" r="2.6"/></g>
+  <g class="bubble-two" fill="none" stroke="#fff" stroke-width=".95"><circle cx="113" cy="160" r="1.7"/></g>
+  <g class="bubble-three" fill="none" stroke="#fff" stroke-width="1"><circle cx="59" cy="176" r="2"/></g>
+  <!-- Stationary white brand symbol. -->
+  <g fill="#fff">
+    <path d="M69.7 124 L99.7 75.4 L108.8 90.4 L89 122.1 Q87.7 124 84.7 124Z"/>
+    <path d="M112.9 99.9 Q116.1 94.6 120 100.8 L135.2 124 H107.1 Q104 124 106.1 120.7Z"/>
+    <circle cx="116.3" cy="82" r="5.5"/>
+  </g>
 </g>
-<circle cx="100" cy="100" r="96" fill="none" stroke="#fff" stroke-width="1.6" opacity=".91"/>
+<circle cx="100" cy="100" r="96" fill="none" stroke="#fff" stroke-width="1.4" opacity=".76"/>
 </svg>
