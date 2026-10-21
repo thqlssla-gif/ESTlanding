@@ -46,11 +46,82 @@ function examplePanel(){
  (exampleCount()?'<button class="btn danger" data-action="remove-examples">예시 데이터만 삭제</button>':'')+'</div>'+
  '<p class="small muted" style="margin:13px 0 0">원본 사이트의 공개 가상 자료만 사용하며, 비공개 사용자 기록이나 원본 멘토의 연락처는 포함하지 않았습니다.</p></div>';
 }
+
+/* ----- User timetable_양식.xlsx import, local-only encrypted course storage ----- */
+function normalizeCourseDate(value){
+ if(value instanceof Date&&!Number.isNaN(+value))return iso(value);
+ if(typeof value==="number"&&typeof XLSX!=="undefined"&&XLSX.SSF){
+  const d=XLSX.SSF.parse_date_code(value);
+  if(d)return [d.y,String(d.m).padStart(2,'0'),String(d.d).padStart(2,'0')].join('-');
+ }
+ const s=String(value||'').trim();
+ let m=s.match(/^(\d{4})[.\/-](\d{1,2})[.\/-](\d{1,2})/);
+ if(!m)return '';
+ const out=m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');
+ return iso(new Date(out+'T12:00:00'))===out?out:'';
+}
+function validCourseRow(raw){
+ const name=text(raw.name),start=normalizeCourseDate(raw.start),end=normalizeCourseDate(raw.end);
+ const total=Number(raw.total)||0;
+ if(!name||!start||!end||start>end||!Number.isInteger(total)||total<1||total>1000)return null;
+ return {name,start,end,kind:text(raw.kind)||'평일',days:text(raw.days)||'월~금',time:text(raw.time)||'시간 미정',
+ total,teacher:text(raw.teacher),room:text(raw.room),memo:text(raw.memo)};
+}
+function mergeTimetableRows(rows,source){
+ let created=0,updated=0,skipped=0;
+ for(const original of rows){
+  const row=validCourseRow(original);
+  if(!row){skipped++;continue}
+  const uploadKey=row.kind+'|'+row.name;
+  // Import updates only previously imported records or exact matches from same sample. Never rewrite a mentor's original record.
+  let existing=db.courses.find(c=>c.uploadSource===source&&c.uploadKey===uploadKey);
+  if(!existing)existing=db.courses.find(c=>c.uploadSource==='sample-template'&&c.name===row.name&&c.start===row.start);
+  if(existing){
+   const retain={id:existing.id,progress:existing.progress||0,uploadSource:source,uploadKey,example:false,
+    sourceLabel:source==='sample-template'?'업로드된 엑셀 양식':'엑셀에서 가져온 과정'};
+   Object.assign(existing,row,retain);
+   delete existing.sessionDates;delete existing.progressDetails;delete existing.daysB;
+   existing.progress=Math.min(existing.progress,existing.total);
+   updated++;
+  }else{
+   db.courses.push({id:uid(),...row,progress:0,mode:'오프라인',example:false,uploadSource:source,uploadKey,
+    sourceLabel:source==='sample-template'?'업로드된 엑셀 양식':'엑셀에서 가져온 과정'});
+   created++;
+  }
+ }
+ return {created,updated,skipped};
+}
+function ensureTemplateTimetable(){
+ if(db.settings.templateTimetableAppliedV1)return false;
+ if(typeof UPLOADED_TIMETABLE_ROWS==='undefined')return false;
+ mergeTimetableRows(UPLOADED_TIMETABLE_ROWS,'sample-template');
+ db.settings.templateTimetableAppliedV1=true;
+ return true;
+}
+async function importTimetableFile(file){
+ if(typeof XLSX==='undefined')throw Error('엑셀 읽기 기능이 로드되지 않았어요. 페이지를 새로고침해 주세요.');
+ const raw=await file.arrayBuffer(),workbook=XLSX.read(raw,{type:'array',cellDates:true});
+ const sheet=workbook.Sheets[workbook.SheetNames.includes('개강표')?'개강표':workbook.SheetNames[0]];
+ if(!sheet)throw Error('시간표 시트를 찾지 못했어요.');
+ const rows=XLSX.utils.sheet_to_json(sheet,{defval:''});
+ if(!rows.length)throw Error('시간표에 과정 데이터가 없습니다.');
+ const normalized=rows.map(row=>({
+  kind:row['구분'],name:row['과정명'],start:row['개강일'],end:row['종강일'],
+  days:row['요일'],time:row['시간'],total:row['시수'],teacher:row['강사'],room:row['강의실'],memo:row['비고']
+ }));
+ const valid=normalized.filter(x=>validCourseRow(x));
+ if(!valid.length)throw Error('과정명·개강일·종강일·시수가 올바르게 입력된 행이 없습니다.');
+ if(!confirm(valid.length+'개 과정 데이터를 현재 데스크에 등록할까요? 이미 엑셀에서 가져온 같은 과정은 갱신됩니다. 학생 정보는 유지됩니다.'))return;
+ const counts=mergeTimetableRows(valid,'personal-excel');
+ await persist();page='courses';render();
+ notify('엑셀 시간표: '+counts.created+'개 추가 · '+counts.updated+'개 갱신'+(counts.skipped?' · '+counts.skipped+'개 제외':''));
+}
+
 function fresh(){db=blank();page='home';studentQuery='';studentFilter='전체';messageTemplate='welcome';modal=null}
 function storeOk(){try{return !!localStorage.getItem(STORAGE)}catch(e){return false}}
 function authScreen(){let exists=storeOk();app.innerHTML='<div class="auth-layout"><div class="auth-card"><div class="auth-logo">✿</div><div class="eyebrow" style="margin-top:24px">PERSONAL MENTOR WORKSPACE</div><h1>'+ (exists?'다시 오셨네요!':'나만의 학생관리 데스크')+'</h1><p>'+(exists?'비밀번호를 입력하면 저장해둔 상담 기록과 학생 정보를 불러옵니다.':'학생관리 데이터를 보호할 비밀번호를 처음 한 번 설정해 주세요. 이 비밀번호는 서버로 보내지지 않습니다.')+'</p><form data-form="'+(exists?'unlock':'setup')+'" class="auth-form"><div class="field-group"><label class="field-label" for="pass">비밀번호</label><input id="pass" type="password" name="password" class="field" autocomplete="'+(exists?'current-password':'new-password')+'" minlength="8" required placeholder="8자 이상"></div>'+(exists?'':'<div class="field-group"><label class="field-label">비밀번호 확인</label><input type="password" name="confirm" class="field" minlength="8" autocomplete="new-password" required placeholder="한 번 더 입력"></div>')+'<button type="submit" class="btn primary" style="padding:14px"> '+(exists?'잠금 해제':'개인 데스크 만들기')+' → </button></form><div class="auth-note">🔒 학생 기록은 이 기기의 브라우저에 암호화해 저장됩니다. 비밀번호를 잊으면 기존 데이터를 복구할 수 없습니다. 다른 기기에서는 백업 파일을 가져와야 합니다.</div>'+(exists?'<button class="text-link" data-action="restore">암호화 백업 파일 가져오기</button>':'')+'<p class="lock-note">GitHub Pages는 페이지를 공개하지만, 실제 학생 기록이나 비밀번호를 GitHub 저장소에 올리지 않습니다.</p></div></div>'}
-async function setup(password){let salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(password,salt);fresh();seedExamples();localStorage.setItem(STORAGE,JSON.stringify({version:1,salt:bytesTo64(salt),iv:'',data:''}));await persist();render();notify('예시 학생 · 과정 · 상담 기록이 준비됐어요 🍓')}
-async function unlock(password){const obj=JSON.parse(localStorage.getItem(STORAGE));const k=await derive(password,b64ToBytes(obj.salt));let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));let read=JSON.parse(new TextDecoder().decode(raw));if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');key=k;db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));page='home';if(!db.settings.referenceDemoVersion && exampleCount()>0 && db.tasks.filter(x=>x.example).length===9 && db.templates.filter(x=>x.example).length===4){clearExamples();seedExamples();await persist()}else if(!db.settings.examplesInitialized&&!db.students.length&&!db.courses.length&&!db.tasks.length){seedExamples();await persist()}render();notify('안전하게 잠금을 해제했어요')}
+async function setup(password){let salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(password,salt);fresh();seedExamples();ensureTemplateTimetable();localStorage.setItem(STORAGE,JSON.stringify({version:1,salt:bytesTo64(salt),iv:'',data:''}));await persist();render();notify('예시 학생 · 과정 · 상담 기록이 준비됐어요 🍓')}
+async function unlock(password){const obj=JSON.parse(localStorage.getItem(STORAGE));const k=await derive(password,b64ToBytes(obj.salt));let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64ToBytes(obj.iv)},k,b64ToBytes(obj.data));let read=JSON.parse(new TextDecoder().decode(raw));if(!read||!Array.isArray(read.students)||!Array.isArray(read.courses)||!Array.isArray(read.tasks))throw new Error('invalid');key=k;db={...blank(),...read,settings:{...blank().settings,...(read.settings||{})}};if(!Array.isArray(db.templates))db.templates=JSON.parse(JSON.stringify(EMPTY_TEMPLATES));page='home';if(!db.settings.referenceDemoVersion && exampleCount()>0 && db.tasks.filter(x=>x.example).length===9 && db.templates.filter(x=>x.example).length===4){clearExamples();seedExamples();await persist()}else if(!db.settings.examplesInitialized&&!db.students.length&&!db.courses.length&&!db.tasks.length){seedExamples();await persist()}if(ensureTemplateTimetable())await persist();render();notify('안전하게 잠금을 해제했어요')}
 const tabs=[['home','대시보드'],['students','학생 관리'],['courses','과정 · 시간표'],['calendar','일정 캘린더'],['tasks','할 일 · 콜백'],['messages','문자 템플릿'],['settings','설정 · 백업']];
 function shell(content){const title=tabs.find(x=>x[0]===page)?.[1]||'대시보드';const nav=tabs.map(x=>'<button class="nav-btn '+(page===x[0]?'active':'')+'" data-nav="'+x[0]+'">'+icon(x[0])+'<span>'+x[1]+'</span></button>').join('');
 app.innerHTML='<div class="app"><aside class="sidebar"><div class="brand"><div class="brand-mark">✿</div><div><h1>SO:BIN DESK</h1><small>MENTOR WORKSPACE</small></div></div><div class="nav-label">WORKSPACE</div><div class="nav">'+nav+'</div><div class="side-bottom"><div class="secure-box"><b><span class="secure-dot"></span> 개인 암호화 저장</b>이 브라우저에만 데이터가 저장됩니다. 다른 기기에는 암호화 백업을 가져와 주세요.</div><div class="user-small"><span class="user-icon">'+E((db.settings.mentor||'소').slice(0,1))+'</span><div><strong>'+E(db.settings.mentor)+' 멘토</strong><br>개인 워크스페이스</div></div></div></aside><div class="workspace"><header class="topbar"><div class="breadcrumb">SO:BIN DESK <b>/ '+E(title)+'</b></div><div class="top-right"><span class="date-badge">'+new Intl.DateTimeFormat('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(new Date())+'</span><span class="avatar">'+E((db.settings.mentor||'소').slice(0,1))+'</span><button title="잠그기" data-action="lock" class="btn sm">'+icon('lock')+'</button></div></header><div class="content">'+content+'</div></div></div>'+(modal||'') }
@@ -82,7 +153,7 @@ function students(){let f=db.students.filter(s=>(studentFilter==='전체'||s.sta
 let h=heading('학생 관리','학생별 상담 상태, 준비 분야, 연락 기록을 관리해요.',actions)+'<div class="panel"><div class="toolbar"><input class="search" id="studentSearch" value="'+E(studentQuery)+'" placeholder="이름 · 전화번호 · 준비 분야 검색" aria-label="학생 검색"><select class="field" id="studentFilter" style="width:auto;max-width:170px"><option>전체</option>'+['상담중','등록대기','수강중','수료','보류','종료'].map(s=>'<option '+(studentFilter===s?'selected':'')+'>'+s+'</option>').join('')+'</select><div class="spacer"></div><button class="btn sm" data-action="csv-import">CSV 가져오기</button><span class="muted small">총 '+db.students.length+'명</span></div><div id="studentRows">'+studentTable(f)+'</div></div>';
 return h}
 function courseCard(c){let now=TODAY(),flag=c.end&&c.end<now?['종강','gray']:c.start&&c.start>now?['개강 예정','']:['진행 중','green'],done=Math.min(Number(c.progress||0),Math.max(1,Number(c.total||1))),pct=Math.round(done/Math.max(1,Number(c.total||1))*100);return '<div class="course-card"><div class="course-head">'+pill(flag[0],flag[1])+'<div class="flex"><button class="btn sm" data-edit-course="'+E(c.id)+'">수정</button></div></div><h3>'+E(c.name)+'</h3><div class="course-desc">'+E((c.batch?c.batch+' · ':'')+(c.memo||'과정 목표와 진행 상태를 관리해 보세요.'))+'</div><div class="course-meta"><span>📅 '+E(niceDate(c.start))+' ~ '+E(niceDate(c.end))+'</span><span>🕘 '+E(c.time||'시간 미정')+'</span><span>📍 '+E(c.room||'미정')+'</span><span>👥 '+db.students.filter(s=>studentCourseIds(s).includes(c.id)).length+'명</span></div><div class="flex" style="justify-content:space-between;margin-bottom:7px"><span class="small muted">수업 진도</span><b class="small">'+done+' / '+(Number(c.total)||1)+'회</b></div><div class="progress"><span style="width:'+pct+'%"></span></div><div class="course-bottom"><span class="muted small">'+E(c.days||'요일 미정')+' · '+E(c.mode||'진행 방식 미정')+'</span><button class="text-link" data-action="progress" data-id="'+E(c.id)+'">진도 변경 →</button></div></div>'}
-function courses(){return heading('과정 · 시간표','과정 일정, 수업 회차, 담당 학생을 한눈에 확인해요.','<button class="btn primary" data-add="course">＋ 과정 등록</button>')+(db.courses.length?'<div class="course-grid">'+[...db.courses].sort((a,b)=>(a.start||'').localeCompare(b.start||'')).map(courseCard).join('')+'</div>': '<div class="panel">'+empty('📚','첫 과정을 등록해 주세요','개강·종강 일정과 수업 진도, 학생 배정 상태를 연결합니다.','<button class="btn primary" data-add="course">과정 등록</button>')+'</div>')+'<div class="alert section-gap">💡 수업 요일은 “월·수·금”, “월~금”, “토·일” 등으로 입력하면 월간 캘린더에도 표시됩니다.</div>'}
+function courses(){return heading('과정 · 시간표','과정 일정, 수업 회차, 담당 학생을 한눈에 확인해요.','<div class="flex wrap"><button class="btn" data-action="xlsx-import">엑셀 시간표 올리기</button><button class="btn primary" data-add="course">＋ 과정 등록</button></div>')+(db.courses.length?'<div class="course-grid">'+[...db.courses].sort((a,b)=>(a.start||'').localeCompare(b.start||'')).map(courseCard).join('')+'</div>': '<div class="panel">'+empty('📚','첫 과정을 등록해 주세요','개강·종강 일정과 수업 진도, 학생 배정 상태를 연결합니다.','<button class="btn primary" data-add="course">과정 등록</button>')+'</div>')+'<div class="alert section-gap">💡 수업 요일은 “월·수·금”, “월~금”, “토·일” 등으로 입력하면 월간 캘린더에도 표시됩니다.</div>'}
 function meets(c,day){if(Array.isArray(c.sessionDates)&&c.sessionDates.length)return c.sessionDates.includes(day);if(!c.start||day<c.start||(c.end&&day>c.end))return false;let wk=new Date(day+'T12:00:00').getDay(),raw=c.days||'';if(raw.includes('매일'))return true;if(raw.includes('평일')||raw.includes('월~금')||raw.includes('월-금'))return wk>=1&&wk<=5;if(raw.includes('주말')||raw.includes('토~일'))return wk===0||wk===6;if(raw.includes('월~토'))return wk>=1&&wk<=6;return !!raw&&raw.includes('일월화수목금토'[wk])}
 function calendar(){let [y,m]=month.split('-').map(Number),date=new Date(y,m-1,1),first=date.getDay(),days=new Date(y,m,0).getDate(),cells=Math.ceil((days+first)/7)*7;let h=heading('일정 캘린더','개강·종강·수업일과 콜백 일정을 함께 확인하세요.','<button class="btn primary" data-add="task">＋ 일정 등록</button>')+'<div class="panel"><div class="calendar-head"><div class="flex"><button class="btn sm" data-month="-1" aria-label="이전 달">‹</button><strong style="font-size:20px">'+y+'년 '+m+'월</strong><button class="btn sm" data-month="1" aria-label="다음 달">›</button></div><button class="btn soft sm" data-month="0">이번 달</button></div><div class="calendar-grid">';
 h+=''.concat(...['일','월','화','수','목','금','토'].map(d=>'<div class="cal-week">'+d+'</div>'));
@@ -107,7 +178,7 @@ function fillMessage(template){
  return String(template.body||'').replace(/\{([^}]+)\}/g,(whole,k)=>vals[k]!=null?vals[k]:whole);
 }
 function messages(){let tpl=byId(db.templates,messageTemplate)||db.templates[0]||EMPTY_TEMPLATES[0];let h=heading('문자 템플릿','학생에게 보낼 메시지를 미리 만들고, 이름과 과정 정보를 자동으로 채워요.','<button class="btn primary" data-add="template">＋ 템플릿 추가</button>')+'<div class="template-grid"><div class="panel"><div class="panel-header"><h3 class="panel-title">저장된 문구</h3></div><div class="template-menu">'+db.templates.map(x=>'<button class="template-choice '+(tpl.id===x.id?'active':'')+'" data-template="'+E(x.id)+'">'+E(x.title)+'</button>').join('')+'</div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">'+E(tpl.title)+'</h3><button class="btn sm" data-edit-template="'+E(tpl.id)+'">문구 수정</button></div><div class="form-grid" style="margin-bottom:15px"><div class="field-group"><label class="field-label">학생 선택</label><select id="messageStudent" class="field"><option value="">학생을 선택하세요</option>'+db.students.map(s=>'<option value="'+E(s.id)+'" '+(messageStudent===s.id?'selected':'')+'>'+E(s.name)+'</option>').join('')+'</select></div><div class="field-group"><label class="field-label">과정 선택</label><select id="messageCourse" class="field"><option value="">학생 등록 과정 / 기본값</option>'+db.courses.map(c=>'<option value="'+E(c.id)+'" '+(messageCourse===c.id?'selected':'')+'>'+E(c.name)+'</option>').join('')+'</select></div></div><div class="msg-preview" id="messagePreview">'+E(fillMessage(tpl))+'</div><div class="flex wrap section-gap"><button class="btn primary" data-action="copy-message">✦ 완성 문구 복사</button><button class="btn" data-action="sms-message">문자 앱 열기</button></div><div class="small muted" style="margin-top:14px">문자는 자동 발송되지 않습니다. 발송 전 내용과 연락처를 확인해 주세요.</div></div></div>';return h}
-function settings(){return heading('설정 · 데이터 관리','내 공간을 설정하고 학생 데이터를 안전하게 백업하세요.')+examplePanel()+'<div class="grid2"><div class="panel"><h3 class="panel-title" style="margin-bottom:20px">프로필 설정</h3><form data-form="settings" class="form-grid"><label class="field-group form-wide"><span class="field-label">멘토명</span><input class="field" name="mentor" maxlength="30" required value="'+E(db.settings.mentor)+'"></label><label class="field-group form-wide"><span class="field-label">소속 표시</span><input class="field" name="branch" maxlength="80" value="'+E(db.settings.branch)+'"></label><div class="form-wide"><button class="btn primary" type="submit">설정 저장</button></div></form></div><div class="panel"><h3 class="panel-title" style="margin-bottom:18px">암호화된 백업 · 복원</h3><div class="alert">학생 정보는 브라우저에서 암호화됩니다. 같은 파일을 다른 PC/휴대폰에서 복원하면 데이터를 옮길 수 있어요. 자동 동기화는 제공하지 않습니다.</div><div class="settings-list"><div class="setting-row"><div><b>암호화 백업 내려받기</b><p>복원하려면 현재 비밀번호가 필요합니다.</p></div><button class="btn primary sm" data-action="backup">백업</button></div><div class="setting-row"><div><b>백업 파일 가져오기</b><p>이 기기의 기존 데이터가 새 파일로 대체됩니다.</p></div><button class="btn sm" data-action="restore">복원</button></div><div class="setting-row"><div><b>학생 CSV 가져오기</b><p>첫 줄: 이름,전화번호,상태,희망분야,메모</p></div><button class="btn sm" data-action="csv-import">CSV</button></div></div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">보안 · 데이터 관리</h3></div><div class="setting-row"><div><b>현재 화면 잠그기</b><p>다시 비밀번호를 입력해야 기록을 열 수 있습니다.</p></div><button class="btn" data-action="lock">잠금</button></div><div class="setting-row"><div><b>이 기기의 모든 데이터 삭제</b><p>암호화된 학생 기록을 영구적으로 지웁니다. 복원하려면 별도의 백업 파일이 필요합니다.</p></div><button class="btn danger" data-action="erase">삭제</button></div><div class="small muted" style="margin-top:17px">저장 방식: 이 브라우저의 암호화된 로컬 저장소 · AES-GCM / PBKDF2. GitHub Pages 자체에는 로그인·서버 동기화·푸시 알림 기능이 없습니다. 공용 기기에서 사용하지 마세요.</div></div>'}
+function settings(){return heading('설정 · 데이터 관리','내 공간을 설정하고 학생 데이터를 안전하게 백업하세요.')+'<div class="panel"><div class="panel-header"><h3 class="panel-title">엑셀 시간표 관리</h3></div><p class="muted">업로드한 시간표_양식.xlsx에 입력된 2개 과정이 등록되어 있어요. 앞으로 동일 양식의 엑셀 파일을 올리면 과정·일정이 자동으로 반영됩니다.</p><button class="btn primary" data-action="xlsx-import">엑셀 시간표 올리기</button></div>'+examplePanel()+'<div class="grid2"><div class="panel"><h3 class="panel-title" style="margin-bottom:20px">프로필 설정</h3><form data-form="settings" class="form-grid"><label class="field-group form-wide"><span class="field-label">멘토명</span><input class="field" name="mentor" maxlength="30" required value="'+E(db.settings.mentor)+'"></label><label class="field-group form-wide"><span class="field-label">소속 표시</span><input class="field" name="branch" maxlength="80" value="'+E(db.settings.branch)+'"></label><div class="form-wide"><button class="btn primary" type="submit">설정 저장</button></div></form></div><div class="panel"><h3 class="panel-title" style="margin-bottom:18px">암호화된 백업 · 복원</h3><div class="alert">학생 정보는 브라우저에서 암호화됩니다. 같은 파일을 다른 PC/휴대폰에서 복원하면 데이터를 옮길 수 있어요. 자동 동기화는 제공하지 않습니다.</div><div class="settings-list"><div class="setting-row"><div><b>암호화 백업 내려받기</b><p>복원하려면 현재 비밀번호가 필요합니다.</p></div><button class="btn primary sm" data-action="backup">백업</button></div><div class="setting-row"><div><b>백업 파일 가져오기</b><p>이 기기의 기존 데이터가 새 파일로 대체됩니다.</p></div><button class="btn sm" data-action="restore">복원</button></div><div class="setting-row"><div><b>학생 CSV 가져오기</b><p>첫 줄: 이름,전화번호,상태,희망분야,메모</p></div><button class="btn sm" data-action="csv-import">CSV</button></div></div></div></div><div class="panel"><div class="panel-header"><h3 class="panel-title">보안 · 데이터 관리</h3></div><div class="setting-row"><div><b>현재 화면 잠그기</b><p>다시 비밀번호를 입력해야 기록을 열 수 있습니다.</p></div><button class="btn" data-action="lock">잠금</button></div><div class="setting-row"><div><b>이 기기의 모든 데이터 삭제</b><p>암호화된 학생 기록을 영구적으로 지웁니다. 복원하려면 별도의 백업 파일이 필요합니다.</p></div><button class="btn danger" data-action="erase">삭제</button></div><div class="small muted" style="margin-top:17px">저장 방식: 이 브라우저의 암호화된 로컬 저장소 · AES-GCM / PBKDF2. GitHub Pages 자체에는 로그인·서버 동기화·푸시 알림 기능이 없습니다. 공용 기기에서 사용하지 마세요.</div></div>'}
 function render(){if(!key){authScreen();return}const body={home:dashboard,students:students,courses:courses,calendar:calendar,tasks:tasks,messages:messages,settings:settings}[page]||dashboard;shell(body())}
 function dialog(title,body,actions,wide){modal='<div class="modal-shade" data-shade="1"><div class="modal '+(wide?'wide':'')+'" role="dialog" aria-modal="true" aria-label="'+E(title)+'"><div class="modal-head"><h3>'+E(title)+'</h3><button class="modal-close" data-action="close" aria-label="닫기">×</button></div>'+body+(actions||'')+'</div></div>';render();let first=document.querySelector('.modal .field');if(first)first.focus()}
 function actions(saveLabel){return '<div class="modal-actions"><button type="button" class="btn" data-action="close">취소</button><button class="btn primary" type="submit">'+(saveLabel||'저장하기')+'</button></div>'}
@@ -152,6 +223,7 @@ case 'remove-examples':if(!exampleCount()){notify('삭제할 예시 데이터가
 case 'backup':await saveChain;download('sobin-desk-encrypted-'+TODAY()+'.json',localStorage.getItem(STORAGE),'application/json');notify('암호화된 백업 파일을 저장했어요');break;
 case 'restore':document.getElementById('restoreInput').click();break;
 case 'csv-import':document.getElementById('csvInput').click();break;
+case 'xlsx-import':document.getElementById('scheduleInput').click();break;
 case 'erase':if(prompt('삭제하면 되돌릴 수 없습니다. 계속하려면 "삭제"를 입력해 주세요.')!=='삭제')return;await saveChain;localStorage.removeItem(STORAGE);key=null;fresh();authScreen();notify('이 기기의 기록을 삭제했어요');break;
 case 'progress':{let c=byId(db.courses,ds.id);if(!c)return;let val=prompt('현재까지 진행된 회차를 입력하세요. (총 '+c.total+'회)',c.progress||0);if(val===null)return;let n=Number(val);if(!Number.isInteger(n)||n<0||n>Number(c.total||1)){notify('0부터 총 회차까지 입력해 주세요');return}c.progress=n;await persist();render();notify('진도를 수정했어요');break}
 case 'copy-message':{let tp=byId(db.templates,messageTemplate)||db.templates[0];if(!tp)return;try{await navigator.clipboard.writeText(fillMessage(tp));notify('문자 내용을 복사했어요')}catch(e){notify('복사 권한을 허용해 주세요')}break}
@@ -174,5 +246,6 @@ if(type==='settings'){db.settings.mentor=get('mentor')||'멘토';db.settings.bra
 });
 document.getElementById('restoreInput').addEventListener('change',async ev=>{let file=ev.target.files[0];if(!file)return;try{await restoreFile(file)}catch(e){notify('복원 실패: '+e.message)}ev.target.value=''});
 document.getElementById('csvInput').addEventListener('change',async ev=>{let file=ev.target.files[0];if(!file)return;try{await importCsv(file)}catch(e){notify('가져오기 실패: '+e.message)}ev.target.value=''});
+document.getElementById('scheduleInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{await importTimetableFile(f)}catch(err){notify('시간표 가져오기 실패: '+err.message)}e.target.value=''});
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal){modal=null;render()}});
 authScreen();
