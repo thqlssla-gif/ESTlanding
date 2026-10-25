@@ -184,3 +184,51 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .desk-primary,.desk-outline{padding:9px 10px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button,.desk-orbit-core .center-mark{transition:none!important}}
+
+
+/* KAIA reminder notification experience */
+.reminder-bell{position:relative;isolation:isolate;background:#fff6f9;border:1px solid #f1dce4;color:#a45473}
+.reminder-bell:hover{background:#f8e5ed;border-color:#e8c7d4}
+.reminder-count{position:absolute;top:-7px;right:-6px;display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:10px;padding:0 4px;color:#fff;background:#b4607f;font-size:10px;line-height:1;font-weight:850;box-shadow:0 0 0 3px #fff}
+.reminder-count[hidden]{display:none!important}
+.reminder-settings{scroll-margin-top:105px}
+.reminder-settings .panel-header{align-items:flex-start;gap:16px}
+.reminder-intro{font-size:12px;line-height:1.65;margin:7px 0 0}
+.reminder-status{flex:none;color:#9a5975;background:#fbebf1;border:1px solid #f2d9e4;border-radius:20px;padding:7px 10px;font-size:11px;font-weight:800}
+.reminder-form{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.reminder-toggle{display:flex;gap:11px;align-items:center;background:#fcf6f9;border:1px solid #f2e0e8;border-radius:16px;padding:15px 16px}
+.reminder-toggle input,.reminder-choice input{width:17px;height:17px;accent-color:#af6380;flex:none}
+.reminder-toggle b,.reminder-toggle small{display:block}
+.reminder-toggle b{font-size:13px;color:#543f4c}
+.reminder-toggle small{color:#97818e;font-size:11px;line-height:1.7;margin-top:4px}
+.reminder-form-title{font-size:12px;font-weight:800;color:#604552;margin-top:10px}
+.reminder-picks{display:flex;flex-wrap:wrap;gap:9px}
+.reminder-choice{display:inline-flex;gap:8px;align-items:center;min-height:42px;min-width:104px;padding:9px 12px;border:1px solid #efdee5;border-radius:11px;background:#fff;color:#6a5360;font-size:12px;font-weight:690;cursor:pointer}
+.reminder-choice:has(input:checked){border-color:#e2aebe;background:#fff5f8;color:#9b4d69}
+.reminder-time{display:flex;align-items:center;gap:12px;margin:5px 0}
+.reminder-time select{width:145px}
+.reminder-system{display:flex;gap:15px;justify-content:space-between;align-items:center;margin-top:21px;padding:18px;border-radius:17px;border:1px solid #eae1e6;background:#fffafb}
+.reminder-system b{font-size:13px;color:#58434f}
+.reminder-system p{font-size:11px;color:#8e7986;margin:5px 0 0}
+.reminder-system-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.reminder-system-buttons .btn:disabled{opacity:.5;cursor:not-allowed}
+.reminder-caveat{color:#8d7885;font-size:11px;line-height:1.8;margin:15px 0 0}
+.reminder-center>p{font-size:12px;line-height:1.7;margin:0 0 15px}
+.reminder-feed{max-height:min(430px,48vh);overflow-y:auto;border:1px solid #f1e2e8;border-radius:15px}
+.reminder-feed-item{display:flex;align-items:center;gap:13px;padding:15px;border-bottom:1px solid #f5eaf0}
+.reminder-feed-item:last-child{border-bottom:0}
+.reminder-chip{display:inline-flex;align-items:center;justify-content:center;min-width:88px;padding:6px 9px;background:#fcebf1;color:#a45273;border-radius:10px;font-size:11px;font-weight:780;white-space:nowrap}
+.reminder-feed-copy{min-width:0;flex:1}
+.reminder-feed-copy b{display:block;overflow-wrap:anywhere;font-size:13px;color:#4c3846}
+.reminder-feed-copy small{display:block;font-size:11px;color:#907b87;margin-top:5px}
+.reminder-empty{padding:40px 16px;background:#fff8fa;text-align:center;border:1px dashed #ebd8e1;border-radius:14px;font-size:12px;color:#95808b}
+@media(max-width:670px){
+ .reminder-settings .panel-header{flex-direction:column;gap:10px}
+ .reminder-choice{flex:1 1 calc(50% - 9px);min-width:0}
+ .reminder-system{align-items:flex-start;flex-direction:column}
+ .reminder-system-buttons{width:100%}
+ .reminder-system-buttons .btn{flex:1}
+ .reminder-time{align-items:flex-start;flex-direction:column;gap:7px}
+ .reminder-time select{width:100%}
+ .reminder-feed-item{align-items:flex-start;flex-direction:column;gap:8px}
+}
