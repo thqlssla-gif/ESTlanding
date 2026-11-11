@@ -100,6 +100,7 @@
     return raw.map(function(x){
       let row=Object.assign({},x),err='',warning='';
       row.name=cell(row.name);row.phone=cell(row.phone);
+      if(/^10\d{8}$/.test(row.phone)){row.phone='0'+row.phone;warning='휴대폰 앞자리 0 자동 복원';}
       row._provided={status:!!cell(row.status),source:!!cell(row.source)};
       row.status=normalizeStatus(row.status);
       if(!row.name)err='이름 없음';
