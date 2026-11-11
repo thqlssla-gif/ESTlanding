@@ -86,7 +86,7 @@
     if(!a)throw Error('이전 프로그램의 학생 목록을 찾지 못했어요. 암호화 백업은 설정의 "복원" 기능을 이용해 주세요.');
     if(a.length>3000)throw Error('한 번에 최대 3,000명까지 가져올 수 있습니다.');
     return a.map(function(v,i){
-      const get=function(k){const names=[k].concat(ALIASES[k]||[]);for(const n of names){if(v[n]!==undefined&&v[n]!==null)return v[n];}return ''};
+      const get=function(k){if(!v||typeof v!=='object')return '';const names=[k].concat(ALIASES[k]||[]);for(const n of names){if(v[n]!==undefined&&v[n]!==null)return v[n];}return ''};
       return {line:i+1,name:short(get('name'),40),phone:short(get('phone'),30),
         status:get('status'),goal:short(get('goal'),100),source:short(get('source'),80),
         nextContact:get('nextContact'),course:short(get('course')||v.courseName,160),
@@ -100,6 +100,7 @@
     return raw.map(function(x){
       let row=Object.assign({},x),err='',warning='';
       row.name=cell(row.name);row.phone=cell(row.phone);
+      row._provided={status:!!cell(row.status),source:!!cell(row.source)};
       row.status=normalizeStatus(row.status);
       if(!row.name)err='이름 없음';
       else if(!row.status)err='알 수 없는 상담 상태';
@@ -180,7 +181,7 @@
         if(body)logs.push({id:uid(),date:date,body:body});
       });
     }
-    return {name:r.name,phone:r.phone,status:r.status,goal:r.goal,source:r.source||'엑셀 가져오기',
+    return {name:r.name,phone:r.phone,status:r.status,goal:r.goal,source:r.source||((pending&&pending.kind==='legacy')?'이전 프로그램 가져오기':'엑셀 가져오기'),
       nextContact:r.nextContact,courseId:ids[0]||'',courseIds:ids,memo:r.memo||'',logs:logs,updatedAt:new Date().toISOString()};
   }
   async function commitImport(){
@@ -197,7 +198,7 @@
       if(prior){
         if(mode==='skip'){skipped++;return;}
         ['name','phone','goal','status','source','nextContact'].forEach(function(k){
-          if(source[k])prior[k]=source[k];
+          if(source[k]&&(k!=='status'||row._provided.status)&&(k!=='source'||row._provided.source))prior[k]=source[k];
         });
         if(source.courseIds.length){
           prior.courseIds=Array.from(new Set(studentCourseIds(prior).concat(source.courseIds)));
@@ -207,7 +208,7 @@
           prior.memo=prior.memo?prior.memo+'\n\n[파일 가져오기 '+TODAY()+']\n'+source.memo:source.memo;
         }
         prior.logs=Array.isArray(prior.logs)?prior.logs:[];
-        prior.logs.push.apply(prior.logs,source.logs);
+        source.logs.forEach(function(log){if(!prior.logs.some(function(old){return old.date===log.date&&old.body===log.body}))prior.logs.push(log);});
         prior.updatedAt=new Date().toISOString();
         updated++;return;
       }
@@ -281,7 +282,7 @@
   const oldStudents=students;
   students=function(){
     return oldStudents().replace('<span class="muted small">총 ',
-      '<button class="btn sm" data-action="bulk-template">엑셀 양식</button><button class="btn sm primary" data-action="bulk-pick">엑셀로 학생 추가</button><button class="btn sm" data-action="bulk-export">엑셀 내보내기</button><span class="muted small">총 ');
+      '<button class="btn sm" data-action="bulk-template">엑셀 양식</button><button class="btn sm primary" data-action="bulk-pick">엑셀로 학생 추가</button><button class="btn sm" data-action="bulk-export">엑셀 내보내기</button><button class="btn sm" data-action="bulk-legacy">기존 앱에서 가져오기</button><span class="muted small">총 ');
   };
   const oldSettings=settings;
   settings=function(){
