@@ -1,0 +1,14 @@
+/* Student Excel bulk import & preview */
+.bulk-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:2px 0 14px}
+.bulk-counts>div{padding:12px;background:linear-gradient(145deg,#fff7fc,#f4f3fb);border:1px solid #ece1f2;border-radius:13px;text-align:center}
+.bulk-counts b{display:block;color:#73547e;font-size:24px;font-weight:800}
+.bulk-counts span{display:block;color:#746b7d;font-size:11px;margin-top:3px}
+.bulk-table{max-height:310px;overflow:auto;border:1px solid #eee6f3;border-radius:12px;margin:13px 0}
+.bulk-table table{font-size:12px;min-width:580px}
+.bulk-table td,.bulk-table th{padding:9px 10px}
+.bulk-warning{font-size:12px;line-height:1.7;color:#9b5170;background:#fff5f8;border-left:3px solid #d8a0b9;border-radius:7px;padding:9px 12px;margin:7px 0}
+.bulk-options{display:flex;flex-direction:column;gap:10px;background:#fbf8fc;border:1px solid #eee6f3;border-radius:13px;padding:14px;margin-top:16px}
+.bulk-options strong{font-size:13px;color:#685474}
+.bulk-options label{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.55;color:#6f6276;cursor:pointer}
+.bulk-options input{accent-color:#976ba5;margin-top:3px}
+@media(max-width:680px){.bulk-counts{grid-template-columns:repeat(2,minmax(0,1fr))}.bulk-table{max-height:240px}.bulk-table table{min-width:600px}}
