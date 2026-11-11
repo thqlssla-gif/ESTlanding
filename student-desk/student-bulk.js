@@ -29,7 +29,7 @@
     document.body.appendChild(input);inputs[cfg[0]]=input;
   });
   let pending=null;
-  const norm=function(s){return String(s==null?'':s).trim().toLowerCase().replace(/[\s_\-()·./]/g,'')};
+  const norm=function(s){return String(s==null?'':s).trim().toLowerCase().replace(/[\s_()·.\/-]/g,'')};
   const cell=function(v){return String(v==null?'':v).trim()};
   const short=function(v,n){return cell(v).slice(0,n)};
   const uniqueKey=function(s){
